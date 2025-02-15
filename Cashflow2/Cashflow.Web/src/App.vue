@@ -11,7 +11,13 @@ const mode = useColorMode();
 
 const gameCode = ref();
 const getGameCode = async () => {
-    gameCode.value = await fetch("http://cfapi.ashercarlow.com/game/new")
+    fetch("http://cfapi.ashercarlow.com/game/new").then((response) => {
+        response.text().then(gameData => {
+            gameCode.value = gameData;
+        });
+    }).catch((err) => {
+        console.error(err);
+    });
 }
 </script>
 
@@ -28,7 +34,7 @@ const getGameCode = async () => {
         <div class="grid grid-cols-1 lg:grid-cols-2">
             <Board></Board>
             <ControlCenter></ControlCenter>
-            <Button @click="getGameCode" class="w-32 h-32 ml-auto shadow-none">{{ gameCode ?? 'Get Game Code'}}</Button>
+            <Button @click="getGameCode" class="w-32 h-32 ml-auto shadow-none">{{ gameCode ?? 'Get Game Code' }}</Button>
         </div>
     </div>
 </template>
