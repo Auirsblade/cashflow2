@@ -10,6 +10,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ashercarlow.com",
                       policy =>
                       {
+                          policy.SetIsOriginAllowedToAllowWildcardSubdomains();
                           policy.WithOrigins("http://localhost:5173", "http://*.ashercarlow.com", "https://*.ashercarlow.com");
                       });
 });
