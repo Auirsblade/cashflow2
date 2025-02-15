@@ -9,7 +9,7 @@ import Ticker from "@/components/Ticker.vue";
 const mode = useColorMode();
 
 const getGameCode = async () => {
-    await fetch()
+    await fetch("http://cfapi.ashercarlow.com/game/new")
 }
 </script>
 
