@@ -7,6 +7,10 @@ import ControlCenter from "@/components/ControlCenter.vue";
 import Ticker from "@/components/Ticker.vue";
 
 const mode = useColorMode();
+
+const getGameCode = async () => {
+    await fetch()
+}
 </script>
 
 <template>
@@ -22,6 +26,7 @@ const mode = useColorMode();
         <div class="grid grid-cols-1 lg:grid-cols-2">
             <Board></Board>
             <ControlCenter></ControlCenter>
+            <Button @click="getGameCode" class="w-32 h-32 ml-auto shadow-none"/>
         </div>
     </div>
 </template>
