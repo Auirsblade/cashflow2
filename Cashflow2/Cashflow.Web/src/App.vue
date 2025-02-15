@@ -5,11 +5,13 @@ import {useColorMode} from "@vueuse/core";
 import Board from './components/Board.vue';
 import ControlCenter from "@/components/ControlCenter.vue";
 import Ticker from "@/components/Ticker.vue";
+import {ref} from "vue";
 
 const mode = useColorMode();
 
+const gameCode = ref();
 const getGameCode = async () => {
-    await fetch("http://cfapi.ashercarlow.com/game/new")
+    gameCode.value = await fetch("http://cfapi.ashercarlow.com/game/new")
 }
 </script>
 
@@ -26,7 +28,7 @@ const getGameCode = async () => {
         <div class="grid grid-cols-1 lg:grid-cols-2">
             <Board></Board>
             <ControlCenter></ControlCenter>
-            <Button @click="getGameCode" class="w-32 h-32 ml-auto shadow-none"/>
+            <Button @click="getGameCode" class="w-32 h-32 ml-auto shadow-none">{{ gameCode ?? 'Get Game Code'}}</Button>
         </div>
     </div>
 </template>
