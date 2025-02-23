@@ -23,6 +23,7 @@ builder.Services.AddCors(options =>
 });
 
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
+Console.Out.WriteLine(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 builder.Configuration.AddEnvironmentVariables();
 
 builder.WebHost.UseUrls(Environment.GetEnvironmentVariable("DOTNET_URLS")!);
@@ -41,7 +42,7 @@ else
     app.UseCors("ashercarlow.com");
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.MapGet("/game/new",
            () =>
