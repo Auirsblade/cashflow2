@@ -12,7 +12,7 @@ public class Game
 
     public Game()
     {
-        BoardSpaces = JsonSerializer.Deserialize<List<Board>>(File.ReadAllText(@".\Resources\Boards.json"))?.FirstOrDefault(x => x.Name == "Default")?.Spaces;
+        BoardSpaces = JsonSerializer.Deserialize<List<Board>>(File.ReadAllText(@"./Resources/Boards.json"))?.FirstOrDefault(x => x.Name == "Default")?.Spaces;
     }
 }
 
