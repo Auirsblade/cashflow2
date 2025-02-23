@@ -1,5 +1,5 @@
 ﻿export type Space = {
     id: number;
-    title: string;
+    name: string;
     players?: string[];
 }

@@ -5,13 +5,16 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import autoprefixer from "autoprefixer";
 import tailwindcss from "@tailwindcss/vite";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 
 // https://vite.dev/config/
 export default defineConfig({
+    envDir: '../',
     plugins: [
         vue(),
         vueDevTools(),
-        tailwindcss()
+        tailwindcss(),
+        basicSsl()
     ],
     css: {
         postcss: {

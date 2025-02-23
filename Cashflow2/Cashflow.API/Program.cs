@@ -1,4 +1,5 @@
 using Cashflow.API;
+using Cashflow.API.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,25 +12,37 @@ builder.Services.AddCors(options =>
                       policy =>
                       {
                           policy.SetIsOriginAllowedToAllowWildcardSubdomains();
-                          policy.WithOrigins("http://localhost:5173", "http://*.ashercarlow.com", "https://*.ashercarlow.com");
+                          policy.WithOrigins("https://*.ashercarlow.com");
+                      });
+    options.AddPolicy("local",
+                      policy =>
+                      {
+                          policy.SetIsOriginAllowedToAllowWildcardSubdomains();
+                          policy.WithOrigins("https://localhost:5173");
                       });
 });
 
-var app = builder.Build();
-app.UseCors("ashercarlow.com");
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<GameService>();
 
-// if (app.Environment.IsDevelopment())
-// {
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
     app.MapOpenApi();
-// }
+    app.UseCors("local");
+}
+else
+{
+    app.UseCors("ashercarlow.com");
+}
 
 app.UseHttpsRedirection();
 
 app.MapGet("/game/new",
            () =>
            {
-               var gameCode = Utility.RandomAlphanumericString(4);
-               return gameCode;
+               return new Game();
            })
    .WithName("GetNewGame");
 

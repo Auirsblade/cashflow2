@@ -1,0 +1,103 @@
+﻿[
+  {
+    "Name": "Default",
+    "Spaces": [
+      {
+        "Id": 1,
+        "Name": "Payday"
+      },
+      {
+        "Id": 2,
+        "Name": "Deal"
+      },
+      {
+        "Id": 3,
+        "Name": "Market"
+      },
+      {
+        "Id": 4,
+        "Name": "Deal"
+      },
+      {
+        "Id": 5,
+        "Name": "Doodad"
+      },
+      {
+        "Id": 6,
+        "Name": "Deal"
+      },
+      {
+        "Id": 7,
+        "Name": "Charity"
+      },
+      {
+        "Id": 8,
+        "Name": "Deal"
+      },
+      {
+        "Id": 9,
+        "Name": "Payday"
+      },
+      {
+        "Id": 10,
+        "Name": "Deal"
+      },
+      {
+        "Id": 11,
+        "Name": "Market"
+      },
+      {
+        "Id": 12,
+        "Name": "Deal"
+      },
+      {
+        "Id": 13,
+        "Name": "Doodad"
+      },
+      {
+        "Id": 14,
+        "Name": "Deal"
+      },
+      {
+        "Id": 15,
+        "Name": "Baby"
+      },
+      {
+        "Id": 16,
+        "Name": "Deal"
+      },
+      {
+        "Id": 17,
+        "Name": "Payday"
+      },
+      {
+        "Id": 18,
+        "Name": "Deal"
+      },
+      {
+        "Id": 19,
+        "Name": "Market"
+      },
+      {
+        "Id": 20,
+        "Name": "Deal"
+      },
+      {
+        "Id": 21,
+        "Name": "Doodad"
+      },
+      {
+        "Id": 22,
+        "Name": "Deal"
+      },
+      {
+        "Id": 23,
+        "Name": "Downsized"
+      },
+      {
+        "Id": 24,
+        "Name": "Deal"
+      }
+    ]
+  }
+]
