@@ -14,6 +14,8 @@ services:
       target: final
     ports:
       - ${DOTNET_PORT:-5066}:${DOTNET_PORT:-5066}
+    environment:
+      - DOTNET_URLS=${DOTNET_URLS}
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
