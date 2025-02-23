@@ -22,6 +22,10 @@ builder.Services.AddCors(options =>
                       });
 });
 
+DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
+builder.Configuration.AddEnvironmentVariables();
+
+builder.WebHost.UseUrls(Environment.GetEnvironmentVariable("DOTNET_URLS")!);
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<GameService>();
 
