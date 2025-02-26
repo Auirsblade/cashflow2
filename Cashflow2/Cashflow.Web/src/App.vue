@@ -47,10 +47,10 @@ const getGame = () => {
             </Button>
         </header>
         <Ticker></Ticker>
-        <div v-if="!game" class="flex items-center justify-center h-full">
-            <Input v-model="player.name"></Input>
+        <div v-if="!game" class="content-center grid grid-cols-1 lg:grid-cols-2 w-full gap-2 mt-2">
+            <Input v-model="player.name" placeholder="username" class="mx-auto lg:mr-0 my-auto w-48"></Input>
             <Button @click="getGame"
-                    class="w-32 h-32 ml-auto border-2 dark:border-emerald-300 border-emerald-900 rounded-md m-2 p-2 shadow drop-shadow-md shadow-gray-600">
+                    class="mx-auto lg:ml-0 w-48 my-auto border-2 dark:border-emerald-300 border-emerald-900 rounded-md p-2 shadow drop-shadow-md shadow-gray-600">
                 {{ 'Start Game' }}
             </Button>
         </div>
