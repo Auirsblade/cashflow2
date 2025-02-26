@@ -12,21 +12,10 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { BoardSpaceModel } from './BoardSpaceModel';
-import {
-    BoardSpaceModelFromJSON,
-    BoardSpaceModelFromJSONTyped,
-    BoardSpaceModelToJSON,
-    BoardSpaceModelToJSONTyped,
-} from './BoardSpaceModel';
-import type { PlayerModel } from './PlayerModel';
-import {
-    PlayerModelFromJSON,
-    PlayerModelFromJSONTyped,
-    PlayerModelToJSON,
-    PlayerModelToJSONTyped,
-} from './PlayerModel';
+import type {BoardSpaceModel} from './BoardSpaceModel';
+import {BoardSpaceModelFromJSON, BoardSpaceModelToJSON,} from './BoardSpaceModel';
+import type {PlayerModel} from './PlayerModel';
+import {PlayerModelFromJSON, PlayerModelToJSON,} from './PlayerModel';
 
 /**
  * 

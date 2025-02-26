@@ -12,21 +12,10 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { PlayerModel } from './PlayerModel';
-import {
-    PlayerModelFromJSON,
-    PlayerModelFromJSONTyped,
-    PlayerModelToJSON,
-    PlayerModelToJSONTyped,
-} from './PlayerModel';
-import type { GameModel } from './GameModel';
-import {
-    GameModelFromJSON,
-    GameModelFromJSONTyped,
-    GameModelToJSON,
-    GameModelToJSONTyped,
-} from './GameModel';
+import type {PlayerModel} from './PlayerModel';
+import {PlayerModelFromJSON, PlayerModelToJSON,} from './PlayerModel';
+import type {GameModel} from './GameModel';
+import {GameModelFromJSON, GameModelToJSON,} from './GameModel';
 
 /**
  * 

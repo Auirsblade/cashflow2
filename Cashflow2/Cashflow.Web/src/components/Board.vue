@@ -1,10 +1,11 @@
 ﻿<script setup lang="ts">
 import {computed} from "vue";
+import type {PropType} from "vue";
 import type {BoardSpaceModel} from "@/models/BoardSpaceModel.ts";
 import BoardSpace from '@/components/BoardSpace.vue'
 
 const { spaces } = defineProps({
-    spaces: Array<BoardSpaceModel>
+    spaces: Object as PropType<Array<BoardSpaceModel> | null>
 })
 
 const sortedSpaces = computed(() => {
