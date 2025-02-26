@@ -4,7 +4,7 @@ type ErrorResponseCallbackFunction = (data: unknown, response: Response|null, er
 type ResponseCallbackFunction = (response: Response|null) => void;
 
 export class DataRequestHandler {
-    onSucccessCallback: DataResponseCallbackFunction = () => {};
+    onSuccessCallback: DataResponseCallbackFunction = () => {};
     onErrorCallback: ErrorResponseCallbackFunction = () => {};
     onCompleteCallback: ResponseCallbackFunction = () => {};
     logResponse: boolean = false;
@@ -12,7 +12,7 @@ export class DataRequestHandler {
 
     async get(url: RequestInfo | URL){
         return this.handleResponse(url, {
-            credentials: 'include',
+            //credentials: 'include',
             method: 'GET',
             // headers: {
             //     "Authorization": "Basic " + user/password?
@@ -23,7 +23,7 @@ export class DataRequestHandler {
     async post(url: RequestInfo | URL, data?: object){
         if (data)
             return this.handleResponse(url, {
-                credentials: 'include',
+                //credentials: 'include',
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export class DataRequestHandler {
 
     async put(url: RequestInfo | URL, data: object){
         return this.handleResponse(url, {
-            credentials: 'include',
+            //credentials: 'include',
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export class DataRequestHandler {
         if (this.logData) console.log(data);
 
         if (!response.ok) this.onErrorCallback(data, response, undefined);
-        else this.onSucccessCallback(data, response);
+        else this.onSuccessCallback(data, response);
         this.onCompleteCallback(response);
 
         return data;

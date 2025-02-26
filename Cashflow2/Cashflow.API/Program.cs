@@ -1,4 +1,5 @@
 using Cashflow.API;
+using Cashflow.API.DTOs;
 using Cashflow.API.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,12 +14,13 @@ builder.Services.AddCors(options =>
                       {
                           policy.SetIsOriginAllowedToAllowWildcardSubdomains();
                           policy.WithOrigins("https://*.ashercarlow.com");
+                          policy.WithHeaders("Content-Type");
                       });
     options.AddPolicy("local",
                       policy =>
                       {
-                          policy.SetIsOriginAllowedToAllowWildcardSubdomains();
                           policy.WithOrigins("https://localhost:5173");
+                          policy.WithHeaders("Content-Type");
                       });
 });
 
@@ -44,11 +46,18 @@ else
 
 //app.UseHttpsRedirection();
 
-app.MapGet("/game/new",
-           () =>
-           {
-               return new Game();
-           })
-   .WithName("GetNewGame");
+app.MapPost("/game/new",
+            (GameRequest request) =>
+            {
+                Game game = new();
+                game.Players.Add(request.player);
+
+                return new GameResponse
+                {
+                    CurrentPlayer = request.player,
+                    game = game
+                };
+            })
+   .WithName("PostNewGame");
 
 app.Run();
