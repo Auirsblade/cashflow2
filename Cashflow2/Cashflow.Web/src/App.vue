@@ -9,7 +9,7 @@
     import {ref, watch} from "vue";
     import type {GameModel} from "@/apiClient/models/GameModel.ts";
     import type {PlayerModel} from "@/apiClient/models/PlayerModel.ts";
-    import {useSignalR, useSignalRInvoke, useSignalROn} from "@/lib/signalR.js";
+    import {useSignalR, useSignalRInvoke, useSignalROn} from "@/lib/signalR";
     import type {GameResponseModel} from "@/apiClient";
 
     const mode = useColorMode();
