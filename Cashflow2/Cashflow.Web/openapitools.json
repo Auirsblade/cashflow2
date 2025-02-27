@@ -6,9 +6,8 @@
     "generators": {
       "v1": {
         "generatorName": "typescript-fetch",
-        "output": "./src",
-        "globalProperty": "models",
-        "inputSpec": "http://localhost:5066/openapi/v1.json",
+        "output": "./src/apiClient",
+        "inputSpec": "http://localhost:5066/swagger/v1/swagger.json",
         "modelNameSuffix": "Model"
       }
     }

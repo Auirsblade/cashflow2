@@ -1,38 +1,63 @@
 <script setup lang="ts">
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input'
-import {Icon} from '@iconify/vue'
-import {useColorMode} from "@vueuse/core";
-import Board from "./components/Board.vue";
-import ControlCenter from "@/components/ControlCenter.vue";
-import Ticker from "@/components/Ticker.vue";
-import {ref} from "vue";
-import type {GameModel} from "@/models/GameModel.ts";
-import type {PlayerModel} from "@/models/PlayerModel.ts";
-import {DataRequestHandler} from "@/helpers/DataRequestHandler.ts";
-import type {GameResponseModel} from "@/models/GameResponseModel.ts";
-import type {GameRequestModel} from "@/models/GameRequestModel.ts";
+    import {Button} from '@/components/ui/button';
+    import {Input} from '@/components/ui/input'
+    import {Icon} from '@iconify/vue'
+    import {useColorMode} from "@vueuse/core";
+    import Board from "./components/Board.vue";
+    import ControlCenter from "@/components/ControlCenter.vue";
+    import Ticker from "@/components/Ticker.vue";
+    import {ref, watch} from "vue";
+    import type {GameModel} from "@/apiClient/models/GameModel.ts";
+    import type {PlayerModel} from "@/apiClient/models/PlayerModel.ts";
+    import {useSignalR, useSignalRInvoke, useSignalROn} from "@/lib/signalR.js";
+    import type {GameResponseModel} from "@/apiClient";
 
-const mode = useColorMode();
+    const mode = useColorMode();
 
-const game = ref<GameModel>();
+    const game = ref<GameModel>();
+    const player = ref<PlayerModel>({} as PlayerModel);
+    const playerName = ref<string>();
+    const gameCode = ref<string>();
 
-const player = ref<PlayerModel>({} as PlayerModel);
+    const {start, connection, status} = useSignalR(import.meta.env.VITE_API_URL.concat("/gameHub"));
 
-const getGame = () => {
-    let drh = new DataRequestHandler();
-    drh.onSuccessCallback = (data) => {
-        let gameResponse = data as GameResponseModel;
-        game.value = gameResponse.game;
-        player.value = gameResponse.currentPlayer!;
-    }
-    drh.onErrorCallback = (err, response) => {
-        console.log(err);
-        console.log(response);
-    }
+    const {execute: createGame, data: newGame} = useSignalRInvoke(connection, 'CreateGame');
 
-    drh.post("/game/new", { player: player.value } as GameRequestModel);
-};
+    const {execute: joinGame, data: joinedGame} = useSignalRInvoke(connection, 'JoinGame');
+
+    watch(newGame, (gameResponse: GameResponseModel) => {
+        if (gameResponse.isSuccess && gameResponse.game && gameResponse.player) {
+            game.value = gameResponse.game;
+            player.value = gameResponse.player;
+        } else {
+            console.log("Game failed to start");
+            console.log(gameResponse.message);
+        }
+    });
+
+    watch(joinedGame, (gameResponse: GameResponseModel) => {
+        if (gameResponse.isSuccess && gameResponse.game && gameResponse.player) {
+            game.value = gameResponse.game;
+            player.value = gameResponse.player;
+        } else {
+            console.log("Failed to join game");
+            console.log(gameResponse.message);
+        }
+    });
+
+    useSignalROn(connection, 'GameStateUpdated', ([gameModel]: [GameModel | undefined]
+    ) => {
+        if (gameModel) {
+            game.value = gameModel;
+        } else {
+            console.log("No game state received");
+        }
+    });
+
+    useSignalROn(connection, 'Error', ([message]: [string]) => {
+        console.log("Error received from server:");
+        console.log(message);
+    });
 
 </script>
 
@@ -47,15 +72,24 @@ const getGame = () => {
             </Button>
         </header>
         <Ticker></Ticker>
-        <div v-if="!game" class="content-center grid grid-cols-1 lg:grid-cols-2 w-full gap-2 mt-2">
-            <Input v-model="player.name" placeholder="username" class="mx-auto lg:mr-0 my-auto w-48"></Input>
-            <Button @click="getGame"
-                    class="mx-auto lg:ml-0 w-48 my-auto border-2 dark:border-emerald-300 border-emerald-900 rounded-md p-2 shadow drop-shadow-md shadow-gray-600">
-                {{ 'Start Game' }}
-            </Button>
+        <div v-if="!game" class="content-center grid grid-cols-1 lg:grid-cols-2 w-full gap-x-2 mt-2">
+            <div>
+                <Input v-model="playerName" placeholder="player name" class="mx-auto lg:mr-0 my-2 w-48"></Input>
+                <Input v-model="gameCode" placeholder="game code" class="mx-auto lg:mr-0 my-2 w-48"></Input>
+            </div>
+            <div>
+                <Button @click="createGame(playerName?.trim())" :disabled="!playerName"
+                        class="block mx-auto my-2 h-10 lg:ml-0 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
+                    {{ 'Start Game' }}
+                </Button>
+                <Button @click="joinGame(playerName?.trim(), gameCode?.trim())" :disabled="!playerName || !gameCode"
+                        class="block mx-auto my-2 h-10 lg:ml-0 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
+                    {{ 'Join Game' }}
+                </Button>
+            </div>
         </div>
         <div v-else class="grid grid-cols-1 lg:grid-cols-2">
-            <Board :spaces="game.boardSpaces"></Board>
+            <Board :game="game"></Board>
             <ControlCenter></ControlCenter>
         </div>
     </div>

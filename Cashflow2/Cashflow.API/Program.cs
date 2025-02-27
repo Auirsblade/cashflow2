@@ -1,6 +1,9 @@
+using System.Net.WebSockets;
 using Cashflow.API;
 using Cashflow.API.DTOs;
 using Cashflow.API.Entities;
+using Cashflow.API.Services;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,15 +15,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ashercarlow.com",
                       policy =>
                       {
-                          policy.SetIsOriginAllowedToAllowWildcardSubdomains();
-                          policy.WithOrigins("https://*.ashercarlow.com");
-                          policy.WithHeaders("Content-Type");
+                          policy.WithOrigins("https://cf2.ashercarlow.com");
+                          policy.AllowAnyHeader();
+                          policy.AllowCredentials();
                       });
     options.AddPolicy("local",
                       policy =>
                       {
                           policy.WithOrigins("https://localhost:5173");
-                          policy.WithHeaders("Content-Type");
+                          policy.AllowAnyHeader();
+                          policy.AllowCredentials();
                       });
 });
 
@@ -31,12 +35,21 @@ builder.Configuration.AddEnvironmentVariables();
 builder.WebHost.UseUrls(Environment.GetEnvironmentVariable("DOTNET_URLS")!);
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<GameService>();
+builder.Services.AddSignalR();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Cashflow API v1", Version = "v1" });
+    // here some other configurations maybe...
+    options.AddSignalRSwaggerGen();
+});
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
     app.UseCors("local");
 }
 else
@@ -46,18 +59,20 @@ else
 
 //app.UseHttpsRedirection();
 
-app.MapPost("/game/new",
-            (GameRequest request) =>
-            {
-                Game game = new();
-                game.Players.Add(request.player);
+app.MapHub<GameHub>("/gameHub");
 
-                return new GameResponse
-                {
-                    CurrentPlayer = request.player,
-                    game = game
-                };
-            })
-   .WithName("PostNewGame");
+// app.MapPost("/game/new",
+//             (GameRequest request) =>
+//             {
+//                 Game game = new();
+//                 game.Players.Add(request.player);
+//
+//                 return new GameResponse
+//                 {
+//                     CurrentPlayer = request.player,
+//                     game = game
+//                 };
+//             })
+//    .WithName("PostNewGame");
 
 app.Run();

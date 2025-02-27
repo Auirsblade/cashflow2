@@ -9,6 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
+        <PackageReference Include="SignalRSwaggerGen" Version="4.7.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.0" />
     </ItemGroup>
 
     <ItemGroup>

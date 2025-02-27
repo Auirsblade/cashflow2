@@ -1,16 +1,18 @@
 ﻿<script setup lang="ts">
 import {computed} from "vue";
 import type {PropType} from "vue";
-import type {BoardSpaceModel} from "@/models/BoardSpaceModel.ts";
+import type {BoardSpaceModel} from "@/apiClient/models/BoardSpaceModel.ts";
+import type {GameModel} from "@/apiClient/models/GameModel.ts";
 import BoardSpace from '@/components/BoardSpace.vue'
 
-const { spaces } = defineProps({
-    spaces: Object as PropType<Array<BoardSpaceModel> | null>
+const { game } = defineProps({
+    game: Object as PropType<GameModel>
 })
 
 const sortedSpaces = computed(() => {
     let reSpaces = new Array<BoardSpaceModel | undefined>();
-    if (spaces){
+    if (game?.boardSpaces){
+        let spaces = game.boardSpaces;
         spaces?.filter(x => x.id! < 8).every(x => reSpaces.push(x));
         reSpaces.push(spaces.find(x => x.id == 24))
         reSpaces.push(spaces.find(x => x.id == 8))

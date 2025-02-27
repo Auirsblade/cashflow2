@@ -12,6 +12,7 @@
     "generateModels": "openapi-generator-cli generate --openapitools openapitools.json"
   },
   "dependencies": {
+    "@microsoft/signalr": "^8.0.7",
     "@tailwindcss/postcss": "^4.0.6",
     "@tailwindcss/vite": "^4.0.6",
     "@vueuse/core": "^12.7.0",
