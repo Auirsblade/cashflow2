@@ -11,6 +11,7 @@
     import type {PlayerModel} from "@/apiClient/models/PlayerModel.ts";
     import {useSignalR, useSignalRInvoke, useSignalROn} from "@/lib/signalR";
     import type {GameResponseModel} from "@/apiClient";
+    import {DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent, DropdownMenuSeparator} from "@/components/ui/dropdown-menu";
 
     const mode = useColorMode();
 
@@ -62,11 +63,23 @@
 </script>
 
 <template>
-    <div class="bg-slate-400 text-slate-900 dark:bg-gray-800  dark:text-blue-300 min-h-dvh">
+    <div class="bg-slate-400 text-slate-900 dark:bg-gray-900  dark:text-blue-300 min-h-dvh">
         <header class="inline-flex items-center w-full">
-            <span v-if="game" class="absolute left-0 p-2">Game Code: {{ game.code }} Player: {{ player.name }}</span>
+            <div class="absolute left-0 ml-2 mt-2">
+                <DropdownMenu v-if="game">
+                    <DropdownMenuTrigger>
+                        <Icon icon="radix-icons:info-circled" class="h-[1.2rem] w-[1.2rem]"/>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent class="ml-2 bg-slate-400 text-slate-900 dark:bg-gray-900 dark:text-blue-300">
+                        <DropdownMenuItem>{{ 'Join Code: ' + game.code }}</DropdownMenuItem>
+                        <DropdownMenuSeparator class="bg-slate-900 dark:bg-blue-300"/>
+                        <DropdownMenuLabel>Players</DropdownMenuLabel>
+                        <DropdownMenuItem v-for="player in game.players" :key="player.id">{{ player.name }}</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
             <h1 class="text-5xl mx-auto">Cashflow 2</h1>
-            <Button @click="mode = mode == 'light' ? 'dark' : 'light'" class="ml-auto absolute right-0 shadow-none">
+            <Button @click="mode = mode == 'light' ? 'dark' : 'light'" class="absolute right-0 shadow-none">
                 <Icon icon="radix-icons:moon" class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"/>
                 <Icon icon="radix-icons:sun" class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"/>
             </Button>

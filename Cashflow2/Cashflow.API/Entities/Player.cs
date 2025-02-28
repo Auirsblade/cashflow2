@@ -1,13 +1,8 @@
 ﻿namespace Cashflow.API.Entities;
 
-public class Player
+public class Player(string name)
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public string Name { get; set; }
-    public string Icon { get; set; }
-
-    public Player(string name)
-    {
-        Name = name;
-    }
+    public string Name { get; set; } = name;
+    public int BoardSpaceId { get; set; } = 1;
 }

@@ -1,12 +1,28 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Cashflow.API.Entities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Cashflow.API.Services;
 
-public class GameService
+public class GameService(IMemoryCache gameCache)
 {
-    private readonly IMemoryCache _gameCache;
-    public GameService(IMemoryCache gameCache)
+    public Game CreateGame(Player creator)
     {
-        _gameCache = gameCache;
+        Game game = new();
+        game.Players.Add(creator);
+
+        gameCache.Set(game.Code, game);
+
+        return game;
+    }
+
+    public Game? JoinGame(Player player, string gameCode)
+    {
+        Game? game = gameCache.Get<Game>(gameCode);
+
+        if (game == null) return null;
+
+        game.Players.Add(player);
+        gameCache.Set(game.Code, game);
+        return game;
     }
 }

@@ -33,10 +33,10 @@ export interface PlayerModel {
     name?: string | null;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof PlayerModel
      */
-    icon?: string | null;
+    boardSpaceId?: number;
 }
 
 /**
@@ -58,7 +58,7 @@ export function PlayerModelFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'] == null ? undefined : json['name'],
-        'icon': json['icon'] == null ? undefined : json['icon'],
+        'boardSpaceId': json['boardSpaceId'] == null ? undefined : json['boardSpaceId'],
     };
 }
 
@@ -75,7 +75,7 @@ export function PlayerModelToJSONTyped(value?: PlayerModel | null, ignoreDiscrim
         
         'id': value['id'],
         'name': value['name'],
-        'icon': value['icon'],
+        'boardSpaceId': value['boardSpaceId'],
     };
 }
 

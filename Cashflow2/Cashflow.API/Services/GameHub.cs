@@ -7,22 +7,12 @@ using SignalRSwaggerGen.Attributes;
 namespace Cashflow.API.Services;
 
 [SignalRHub]
-public class GameHub : Hub<IGameClient>
+public class GameHub(GameService gameService) : Hub<IGameClient>
 {
-    private readonly IMemoryCache _gameCache;
-
-    public GameHub(IMemoryCache gameCache)
-    {
-        _gameCache = gameCache;
-    }
-
     public async Task<GameResponse> CreateGame(string playerName)
     {
         Player player = new(playerName);
-        Game game = new();
-        game.Players.Add(player);
-
-        _gameCache.Set(game.Code, game);
+        Game game = gameService.CreateGame(player);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
 
@@ -31,16 +21,13 @@ public class GameHub : Hub<IGameClient>
 
     public async Task<GameResponse> JoinGame(string playerName, string gameCode)
     {
-        Game? game = _gameCache.Get<Game>(gameCode);
+        Player player = new(playerName);
+        Game? game = gameService.JoinGame(player, gameCode);
         if (game == null)
         {
             await Clients.Client(Context.ConnectionId).Error("Game not found");
             return new GameResponse { IsSuccess = false, Message = "Game not found" };
         }
-
-        Player player = new(playerName);
-        game.Players.Add(player);
-        _gameCache.Set(game.Code, game);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
         await Clients.OthersInGroup(game.Code).GameStateUpdated(game);
