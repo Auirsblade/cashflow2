@@ -1,18 +1,17 @@
 ﻿<script setup lang="ts">
 import {computed} from "vue";
-import type {PropType} from "vue";
-import type {BoardSpaceModel} from "@/apiClient/models/BoardSpaceModel.ts";
-import type {GameModel} from "@/apiClient/models/GameModel.ts";
+import type {BoardSpaceModel} from "@/apiClient";
 import BoardSpace from '@/components/BoardSpace.vue'
+import {useGameStateStore} from "@/stores/gameStateStore.ts";
+import {storeToRefs} from "pinia";
 
-const { game } = defineProps({
-    game: Object as PropType<GameModel>
-})
+const gameState = useGameStateStore();
+const { game } = storeToRefs(gameState)
 
 const sortedSpaces = computed(() => {
     let reSpaces = new Array<BoardSpaceModel>();
-    if (game?.boardSpaces){
-        let spaces = game.boardSpaces;
+    if (game.value?.boardSpaces){
+        let spaces = game.value?.boardSpaces;
         spaces?.filter(x => x.id! < 8).every(x => reSpaces.push(x));
         reSpaces.push(spaces.find(x => x.id == 24)!)
         reSpaces.push(spaces.find(x => x.id == 8)!)
@@ -30,7 +29,7 @@ const sortedSpaces = computed(() => {
 });
 
 const playersOnSpace = (spaceId: number) => {
-    return game?.players?.filter(x => x.boardSpaceId == spaceId);
+    return game?.value?.players?.filter(x => x.boardSpaceId == spaceId);
 }
 
 </script>

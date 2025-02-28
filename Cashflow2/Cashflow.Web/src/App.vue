@@ -6,59 +6,27 @@
     import Board from "./components/Board.vue";
     import ControlCenter from "@/components/ControlCenter.vue";
     import Ticker from "@/components/Ticker.vue";
-    import {ref, watch} from "vue";
-    import type {GameModel} from "@/apiClient/models/GameModel.ts";
-    import type {PlayerModel} from "@/apiClient/models/PlayerModel.ts";
-    import {useSignalR, useSignalRInvoke, useSignalROn} from "@/lib/signalR";
-    import type {GameResponseModel} from "@/apiClient";
-    import {DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent, DropdownMenuSeparator} from "@/components/ui/dropdown-menu";
+    import {ref} from "vue";
+    import {
+        DropdownMenu,
+        DropdownMenuTrigger,
+        DropdownMenuItem,
+        DropdownMenuContent,
+        DropdownMenuSeparator,
+        DropdownMenuLabel
+    } from "@/components/ui/dropdown-menu";
+    import {useGameStateStore} from "@/stores/gameStateStore.ts";
+    import {storeToRefs} from "pinia";
+    import type {ProfessionModel} from "@/apiClient";
 
     const mode = useColorMode();
 
-    const game = ref<GameModel>();
-    const player = ref<PlayerModel>({} as PlayerModel);
+    const gameState = useGameStateStore();
+    const {player, game, playerOptions} = storeToRefs(gameState);
+
     const playerName = ref<string>();
     const gameCode = ref<string>();
-
-    const {start, connection, status} = useSignalR(import.meta.env.VITE_API_URL.concat("/gameHub"));
-
-    const {execute: createGame, data: newGame} = useSignalRInvoke(connection, 'CreateGame');
-
-    const {execute: joinGame, data: joinedGame} = useSignalRInvoke(connection, 'JoinGame');
-
-    watch(newGame, (gameResponse: GameResponseModel) => {
-        if (gameResponse.isSuccess && gameResponse.game && gameResponse.player) {
-            game.value = gameResponse.game;
-            player.value = gameResponse.player;
-        } else {
-            console.log("Game failed to start");
-            console.log(gameResponse.message);
-        }
-    });
-
-    watch(joinedGame, (gameResponse: GameResponseModel) => {
-        if (gameResponse.isSuccess && gameResponse.game && gameResponse.player) {
-            game.value = gameResponse.game;
-            player.value = gameResponse.player;
-        } else {
-            console.log("Failed to join game");
-            console.log(gameResponse.message);
-        }
-    });
-
-    useSignalROn(connection, 'GameStateUpdated', ([gameModel]: [GameModel | undefined]
-    ) => {
-        if (gameModel) {
-            game.value = gameModel;
-        } else {
-            console.log("No game state received");
-        }
-    });
-
-    useSignalROn(connection, 'Error', ([message]: [string]) => {
-        console.log("Error received from server:");
-        console.log(message);
-    });
+    const selectedProfession = ref<ProfessionModel>();
 
 </script>
 
@@ -91,17 +59,40 @@
                 <Input v-model="gameCode" placeholder="game code" class="mx-auto lg:mr-0 my-2 w-48"></Input>
             </div>
             <div>
-                <Button @click="createGame(playerName?.trim())" :disabled="!playerName"
+                <Button @click="gameState.createGame(playerName!)" :disabled="!playerName"
                         class="block mx-auto my-2 h-10 lg:ml-0 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
                     {{ 'Start Game' }}
                 </Button>
-                <Button @click="joinGame(playerName?.trim(), gameCode?.trim())" :disabled="!playerName || !gameCode"
+                <Button @click="gameState.joinGame(playerName!, gameCode!)" :disabled="!playerName || !gameCode"
                         class="block mx-auto my-2 h-10 lg:ml-0 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
                     {{ 'Join Game' }}
                 </Button>
             </div>
         </div>
-        <div v-else class="grid grid-cols-1 lg:grid-cols-2">
+        <div v-else-if="player && !player.profession" class="content-center grid grid-cols-1 lg:grid-cols-2 w-full gap-x-2 mt-2">
+            <div class="mx-auto lg:mr-0 my-2 w-48 h-10 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
+                <DropdownMenu>
+                    <DropdownMenuTrigger class="block w-full h-10 mb-0">
+                        {{ selectedProfession?.name ?? 'Select Profession' }}
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        class="w-48 bg-slate-400 text-slate-900 dark:bg-gray-800 dark:text-blue-300 dark:border-emerald-300 border-emerald-900">
+                        <DropdownMenuLabel>Professions</DropdownMenuLabel>
+                        <DropdownMenuSeparator class="bg-emerald-900 dark:bg-emerald-300"/>
+                        <DropdownMenuItem v-for="(profession, i) in playerOptions?.professions" :key="i" @click="selectedProfession = profession" :class="selectedProfession == profession ? 'font-bold' : ''">
+                            {{ profession.name }}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+            <div>
+                <Button @click="gameState.selectProfession(selectedProfession!)" :disabled="!selectedProfession"
+                        class="block mx-auto my-2 h-10 lg:ml-0 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
+                    {{ 'Start' }}
+                </Button>
+            </div>
+        </div>
+        <div v-else class="grid grid-cols-1 xl:grid-cols-2">
             <Board :game="game"></Board>
             <ControlCenter></ControlCenter>
         </div>

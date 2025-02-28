@@ -20,6 +20,13 @@ import {
     PlayerModelToJSON,
     PlayerModelToJSONTyped,
 } from './PlayerModel';
+import type { PlayerOptionsModel } from './PlayerOptionsModel';
+import {
+    PlayerOptionsModelFromJSON,
+    PlayerOptionsModelFromJSONTyped,
+    PlayerOptionsModelToJSON,
+    PlayerOptionsModelToJSONTyped,
+} from './PlayerOptionsModel';
 import type { GameModel } from './GameModel';
 import {
     GameModelFromJSON,
@@ -54,6 +61,12 @@ export interface GameResponseModel {
     player?: PlayerModel;
     /**
      * 
+     * @type {PlayerOptionsModel}
+     * @memberof GameResponseModel
+     */
+    playerOptions?: PlayerOptionsModel;
+    /**
+     * 
      * @type {GameModel}
      * @memberof GameResponseModel
      */
@@ -80,6 +93,7 @@ export function GameResponseModelFromJSONTyped(json: any, ignoreDiscriminator: b
         'isSuccess': json['isSuccess'] == null ? undefined : json['isSuccess'],
         'message': json['message'] == null ? undefined : json['message'],
         'player': json['player'] == null ? undefined : PlayerModelFromJSON(json['player']),
+        'playerOptions': json['playerOptions'] == null ? undefined : PlayerOptionsModelFromJSON(json['playerOptions']),
         'game': json['game'] == null ? undefined : GameModelFromJSON(json['game']),
     };
 }
@@ -98,6 +112,7 @@ export function GameResponseModelToJSONTyped(value?: GameResponseModel | null, i
         'isSuccess': value['isSuccess'],
         'message': value['message'],
         'player': PlayerModelToJSON(value['player']),
+        'playerOptions': PlayerOptionsModelToJSON(value['playerOptions']),
         'game': GameModelToJSON(value['game']),
     };
 }

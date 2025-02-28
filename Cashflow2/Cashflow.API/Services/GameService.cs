@@ -5,6 +5,8 @@ namespace Cashflow.API.Services;
 
 public class GameService(IMemoryCache gameCache)
 {
+    public Game? GetGame(string gameCode) => gameCache.Get<Game>(gameCode.ToUpper());
+
     public Game CreateGame(Player creator)
     {
         Game game = new();
@@ -15,14 +17,15 @@ public class GameService(IMemoryCache gameCache)
         return game;
     }
 
-    public Game? JoinGame(Player player, string gameCode)
+    public void JoinGame(Player player, Game game)
     {
-        Game? game = gameCache.Get<Game>(gameCode);
-
-        if (game == null) return null;
-
         game.Players.Add(player);
         gameCache.Set(game.Code, game);
-        return game;
+    }
+
+    public void SelectProfession(Game game, Player player, Profession profession)
+    {
+        game.Players.First(x => x.Id == player.Id).SetProfession(profession);
+        gameCache.Set(game.Code, game);
     }
 }

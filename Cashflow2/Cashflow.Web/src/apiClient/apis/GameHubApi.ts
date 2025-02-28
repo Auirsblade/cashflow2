@@ -16,10 +16,16 @@
 import * as runtime from '../runtime';
 import type {
   GameResponseModel,
+  PlayerModel,
+  ProfessionModel,
 } from '../models/index';
 import {
     GameResponseModelFromJSON,
     GameResponseModelToJSON,
+    PlayerModelFromJSON,
+    PlayerModelToJSON,
+    ProfessionModelFromJSON,
+    ProfessionModelToJSON,
 } from '../models/index';
 
 export interface HubsGameHubCreateGamePostRequest {
@@ -29,6 +35,12 @@ export interface HubsGameHubCreateGamePostRequest {
 export interface HubsGameHubJoinGamePostRequest {
     playerName?: string;
     gameCode?: string;
+}
+
+export interface HubsGameHubSelectProfessionPostRequest {
+    gameCode?: string;
+    player?: Omit<PlayerModel, 'income'|'taxes'|'childExpenses'|'expenses'|'netIncome'>;
+    profession?: ProfessionModel;
 }
 
 /**
@@ -94,6 +106,41 @@ export class GameHubApi extends runtime.BaseAPI {
     async hubsGameHubJoinGamePost(requestParameters: HubsGameHubJoinGamePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GameResponseModel> {
         const response = await this.hubsGameHubJoinGamePostRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async hubsGameHubSelectProfessionPostRaw(requestParameters: HubsGameHubSelectProfessionPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['player'] != null) {
+            queryParameters['player'] = requestParameters['player'];
+        }
+
+        if (requestParameters['profession'] != null) {
+            queryParameters['profession'] = requestParameters['profession'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/SelectProfession`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubSelectProfessionPost(requestParameters: HubsGameHubSelectProfessionPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubSelectProfessionPostRaw(requestParameters, initOverrides);
     }
 
 }
