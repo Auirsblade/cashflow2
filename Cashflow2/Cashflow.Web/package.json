@@ -12,6 +12,7 @@
     "generateModels": "openapi-generator-cli generate --openapitools openapitools.json"
   },
   "dependencies": {
+    "@3d-dice/dice-box": "^1.1.4",
     "@microsoft/signalr": "^8.0.7",
     "@tailwindcss/postcss": "^4.0.6",
     "@tailwindcss/vite": "^4.0.6",

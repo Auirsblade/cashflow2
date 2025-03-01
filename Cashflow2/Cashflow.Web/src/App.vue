@@ -3,7 +3,7 @@
     import {Input} from '@/components/ui/input'
     import {Icon} from '@iconify/vue'
     import {useColorMode} from "@vueuse/core";
-    import Board from "./components/Board.vue";
+    import Board from "@/components/board/Board.vue";
     import ControlCenter from "@/components/ControlCenter.vue";
     import Ticker from "@/components/Ticker.vue";
     import {ref} from "vue";

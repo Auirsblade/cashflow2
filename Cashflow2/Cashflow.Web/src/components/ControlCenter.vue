@@ -14,8 +14,8 @@
 <template>
     <div v-if="player?.profession" class="border-2 border-slate-900 dark:border-blue-300  rounded-md m-2 p-2 shadow drop-shadow-md shadow-gray-600">
         <div class="w-full flex place-content-between">
-            <strong>{{ player?.name }}</strong>
-            <span>{{ player?.profession?.name }}</span>
+            <span><strong>{{ player?.name }}</strong> - {{ player?.profession?.name }}</span>
+            <strong>Cash: {{ formatCurrency(player?.cash ?? 0) }}</strong>
         </div>
         <hr/>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -69,6 +69,18 @@
                     <div>{{ formatCurrency(player.expenses ?? 0) }}</div>
                 </div>
             </div>
+            <div class="sm:col-start-2 grid grid-cols-2">
+                <div class="font-bold">Monthly Cash Flow:</div>
+                <div class="col-start-2 text-right font-bold">
+                    <div>{{ formatCurrency(player.netIncome ?? 0) }}</div>
+                </div>
+            </div>
+<!--            <div class="sm:col-start-2 grid grid-cols-2">-->
+<!--                <div class="font-bold">Cash On Hand:</div>-->
+<!--                <div class="col-start-2 text-right font-bold">-->
+<!--                    <div>{{ formatCurrency(player.cash ?? 0) }}</div>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
     </div>
 </template>

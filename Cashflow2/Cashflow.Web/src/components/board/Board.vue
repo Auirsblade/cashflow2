@@ -1,9 +1,10 @@
 ﻿<script setup lang="ts">
 import {computed} from "vue";
 import type {BoardSpaceModel} from "@/apiClient";
-import BoardSpace from '@/components/BoardSpace.vue'
+import BoardSpace from '@/components/board/BoardSpace.vue'
 import {useGameStateStore} from "@/stores/gameStateStore.ts";
 import {storeToRefs} from "pinia";
+import BoardCenter from "@/components/board/BoardCenter.vue";
 
 const gameState = useGameStateStore();
 const { game } = storeToRefs(gameState)
@@ -40,6 +41,6 @@ const playersOnSpace = (spaceId: number) => {
         <div v-for="space in sortedSpaces" :key="space.id">
             <BoardSpace :title="space.name!" :players="playersOnSpace(space.id!)"></BoardSpace>
         </div>
-        <div class="col-start-2 col-end-7 row-start-2 row-end-7">Center</div>
+        <div class="col-start-2 col-end-7 row-start-2 row-end-7"><BoardCenter/></div>
     </div>
 </template>
