@@ -8,7 +8,7 @@
     onMounted(async () => {
         diceBox = new DiceBox({
             id: 'dice-canvas',
-            assetPath: '/public/assets/dice/',
+            assetPath: '/assets/dice/',
             container: '#boardCenter',
             scale: 9
         });
