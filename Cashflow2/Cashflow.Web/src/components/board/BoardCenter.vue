@@ -8,7 +8,7 @@
     onMounted(async () => {
         diceBox = new DiceBox({
             id: 'dice-canvas',
-            assetPath: '/src/assets/dice/',
+            assetPath: '/public/assets/dice/',
             container: '#boardCenter',
             scale: 9
         });
@@ -24,8 +24,8 @@
 </script>
 
 <template>
-    <div id="boardCenter" class="">
-        <Button @click="roll" :hidden="hideRollButton" :disabled="!diceLoaded" >Roll</Button>
+    <div id="boardCenter" class="h-full">
+        <Button @click="roll" :hidden="hideRollButton" :disabled="!diceLoaded" class="absolute" >Roll</Button>
     </div>
 </template>
 
