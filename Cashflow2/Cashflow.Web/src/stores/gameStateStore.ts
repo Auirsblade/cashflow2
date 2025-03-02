@@ -61,6 +61,11 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokeBuyCharity(game.value?.code, player.value?.id);
     }
 
+    const {execute: invokeGetDeal} = useSignalRInvoke(connection, 'GetDeal');
+    async function getDeal(isBig: boolean) {
+        await invokeGetDeal(game.value?.code, player.value?.id, isBig);
+    }
+
     useSignalROn(connection, 'GameStateUpdated', ([gameModel]: [GameModel | undefined]
     ) => {
         if (gameModel) {
@@ -76,5 +81,5 @@ export const useGameStateStore = defineStore('gameState', () => {
         console.log(message);
     });
 
-    return { game, player, playerOptions, myTurn, createGame, joinGame, selectProfession, movePlayer, endTurn, buyCharity }
+    return { game, player, playerOptions, myTurn, createGame, joinGame, selectProfession, movePlayer, endTurn, buyCharity, getDeal }
 })

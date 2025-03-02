@@ -28,6 +28,10 @@
       <EmbeddedResource Include="Resources\Doodads.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <Content Remove="Resources\Deals.json" />
+      <EmbeddedResource Include="Resources\Deals.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

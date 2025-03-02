@@ -71,6 +71,16 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         await Clients.Group(game.Code).GameStateUpdated(game);
     }
 
+    public async Task GetDeal(string gameCode, Guid playerId, bool isBig)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.GetDeal(game, player, isBig);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
     private async Task<Game?> ValidateGameExistence(string gameCode)
     {
         Game? game = gameService.GetGame(gameCode);

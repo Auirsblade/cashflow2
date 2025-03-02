@@ -4,6 +4,7 @@
     import { storeToRefs } from "pinia";
     import { useGameStateStore } from "@/stores/gameStateStore.ts";
     import { computed, onMounted, ref } from "vue";
+    import { formatCurrency } from "../../helpers/FormatHelper.ts";
 
     const gameState = useGameStateStore();
     const { game, player } = storeToRefs(gameState);
@@ -45,6 +46,10 @@
         gameState.buyCharity();
         rolled.value = 0;
         promptSelectCharity.value = true;
+    }
+
+    const getDeal = (isBig: boolean) => {
+        gameState.getDeal(isBig);
     }
 
 </script>
@@ -89,15 +94,29 @@
             </div>
         </div>
         <div v-else-if="game!.dealAction" class="m-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 m-2">
-                <Button @click="confirmAction"
+            <div v-if="!game!.dealAction.asset" class="grid grid-cols-1 md:grid-cols-2 gap-2 m-2">
+                <Button @click="getDeal(true)"
                         class="bg-linear-to-t from-green-200 to-green-400 dark:from-green-800 dark:to-green-950 min-h-24 hover:from-green-300 hover:dark:from-green-900">
                     Big Deal
                 </Button>
-                <Button @click="confirmAction"
+                <Button @click="getDeal(false)"
                         class="bg-linear-to-t from-green-100 to-green-300 dark:from-green-700 dark:to-green-900 min-h-24 hover:from-green-200 hover:dark:from-green-800">
                     Small Deal
                 </Button>
+            </div>
+            <div v-else class="grid grid-cols-2 md:grid-cols-4 m-2 gap-2 p-2 rounded-md bg-gray-200 dark:bg-gray-800 shadow-md">
+                <div class="col-span-2 md:col-span-4">{{ game!.dealAction.asset.name }}</div>
+                <div class="col-span-1 ml-auto">Cost:</div>
+                <div class="col-span-1 ml-auto">{{ formatCurrency(game!.dealAction.asset.value ?? 0) }}</div>
+                <div class="col-span-1 ml-auto">Mortgage:</div>
+                <div class="col-span-1 ml-auto">{{ formatCurrency(game!.dealAction.asset.loanAmount ?? 0) }}</div>
+                <div class="col-span-1 ml-auto">Down Pay:</div>
+                <div class="col-span-1 ml-auto">{{ formatCurrency(game!.dealAction.asset.equity ?? 0) }}</div>
+                <div class="col-span-1 ml-auto">Cash Flow:</div>
+                <div class="col-span-1 ml-auto">{{ formatCurrency(game!.dealAction.asset.income ?? 0) }}</div>
+                <Button @click="buyDeal" class="col-span-2 md:col-span-4 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Buy Deal</Button>
+                <Button @click="buyDeal" class="min-h-10 col-span-2 bg-green-200 dark:bg-green-800 hover:bg-green-500">Sell Deal</Button>
+                <Button @click="confirmAction" class="min-h-10 col-span-2 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500">Pass</Button>
             </div>
         </div>
         <div v-else-if="game!.charityAction" class="m-auto">

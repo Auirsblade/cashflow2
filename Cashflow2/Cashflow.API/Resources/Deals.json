@@ -1,0 +1,27 @@
+﻿{
+  "Big": [
+    {
+      "Name": "House - 3br/2ba",
+      "Type": "3/2",
+      "Equity": 9000,
+      "Value": 70000,
+      "RateOfReturn": 0.045
+    }
+  ],
+  "Small": [
+    {
+      "Name": "Condo - 2br/1ba",
+      "Type": "2/1",
+      "Equity": 5000,
+      "Value": 50000,
+      "RateOfReturn": 0.022
+    },
+    {
+      "Name": "Direct 2 You - Level 1",
+      "Type": "mlm",
+      "Equity": 300,
+      "Value": 0,
+      "RateOfReturn": 0
+    }
+  ]
+}

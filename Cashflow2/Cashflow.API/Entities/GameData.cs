@@ -67,6 +67,7 @@ public class DealAction : GameAction
 {
     public override ActionType Name => ActionType.Deal;
     public override bool IsAnyPlayer => false;
+    public Asset? Asset { get; set; }
 }
 
 public class MarketAction : GameAction

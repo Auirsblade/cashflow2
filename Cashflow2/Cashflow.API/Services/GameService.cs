@@ -82,6 +82,16 @@ public class GameService(IMemoryCache gameCache)
         gameCache.Set(game.Code, game);
     }
 
+    public void GetDeal(Game game, Player player, bool isBig)
+    {
+        Deals? deals = JsonSerializer.Deserialize<Deals>(File.ReadAllText(@"./Resources/Deals.json"));
+        Random random = new();
+        Asset? deal = isBig ? deals?.Big[random.Next(0, deals.Big.Count)] : deals?.Small[random.Next(0, deals.Small.Count)];
+        if (game.DealAction != null) game.DealAction.Asset = deal;
+
+        gameCache.Set(game.Code, game);
+    }
+
     public void EndTurn(Game game, Player player)
     {
         if (player.CharityTurnsRemaining > 0) player.CharityTurnsRemaining--;

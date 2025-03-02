@@ -12,8 +12,11 @@ public static class FinancialConstants
 public class Asset
 {
     public string Name { get; set; }
+    public string Type { get; set; }
+    public decimal Equity { get; set; }
     public decimal Value { get; set; }
     public decimal RateOfReturn { get; set; }
+    public decimal LoanAmount => Value - Equity;
     public decimal Income => Value * (RateOfReturn / FinancialConstants.PAYMENTS_PER_ROUND);
 }
 
@@ -30,4 +33,10 @@ public class Liability
                    / (1.0M - (decimal)Math.Pow(1.0 / 1.0 + (double)InterestRate / FinancialConstants.PAYMENTS_PER_ROUND, -_payments)),
                    2);
     private int _payments => Term * FinancialConstants.PAYMENTS_PER_ROUND;
+}
+
+public class Deals
+{
+    public List<Asset> Big { get; set; }
+    public List<Asset> Small { get; set; }
 }
