@@ -21,9 +21,13 @@
 
     <ItemGroup>
       <Content Remove="Resources\BoardSpaces.json" />
-      <EmbeddedResource Include="Resources\Boards.json" />
+      <EmbeddedResource Include="Resources\Boards.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
       <Content Remove="Resources\Doodads.json" />
-      <EmbeddedResource Include="Resources\Doodads.json" />
+      <EmbeddedResource Include="Resources\Doodads.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
