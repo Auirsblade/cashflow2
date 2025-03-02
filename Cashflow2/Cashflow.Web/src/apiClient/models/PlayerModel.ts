@@ -94,6 +94,18 @@ export interface PlayerModel {
      * @type {number}
      * @memberof PlayerModel
      */
+    charityTurnsRemaining?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PlayerModel
+     */
+    downsizedTurnsRemaining?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PlayerModel
+     */
     readonly income?: number;
     /**
      * 
@@ -146,6 +158,8 @@ export function PlayerModelFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'liabilities': json['liabilities'] == null ? undefined : ((json['liabilities'] as Array<any>).map(LiabilityModelFromJSON)),
         'numberOfChildren': json['numberOfChildren'] == null ? undefined : json['numberOfChildren'],
         'cash': json['cash'] == null ? undefined : json['cash'],
+        'charityTurnsRemaining': json['charityTurnsRemaining'] == null ? undefined : json['charityTurnsRemaining'],
+        'downsizedTurnsRemaining': json['downsizedTurnsRemaining'] == null ? undefined : json['downsizedTurnsRemaining'],
         'income': json['income'] == null ? undefined : json['income'],
         'taxes': json['taxes'] == null ? undefined : json['taxes'],
         'childExpenses': json['childExpenses'] == null ? undefined : json['childExpenses'],
@@ -173,6 +187,8 @@ export function PlayerModelToJSONTyped(value?: Omit<PlayerModel, 'income'|'taxes
         'liabilities': value['liabilities'] == null ? undefined : ((value['liabilities'] as Array<any>).map(LiabilityModelToJSON)),
         'numberOfChildren': value['numberOfChildren'],
         'cash': value['cash'],
+        'charityTurnsRemaining': value['charityTurnsRemaining'],
+        'downsizedTurnsRemaining': value['downsizedTurnsRemaining'],
     };
 }
 

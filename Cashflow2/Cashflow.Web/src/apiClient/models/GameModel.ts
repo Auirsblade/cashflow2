@@ -20,6 +20,27 @@ import {
     BoardSpaceModelToJSON,
     BoardSpaceModelToJSONTyped,
 } from './BoardSpaceModel';
+import type { ConfirmActionModel } from './ConfirmActionModel';
+import {
+    ConfirmActionModelFromJSON,
+    ConfirmActionModelFromJSONTyped,
+    ConfirmActionModelToJSON,
+    ConfirmActionModelToJSONTyped,
+} from './ConfirmActionModel';
+import type { MarketActionModel } from './MarketActionModel';
+import {
+    MarketActionModelFromJSON,
+    MarketActionModelFromJSONTyped,
+    MarketActionModelToJSON,
+    MarketActionModelToJSONTyped,
+} from './MarketActionModel';
+import type { CharityActionModel } from './CharityActionModel';
+import {
+    CharityActionModelFromJSON,
+    CharityActionModelFromJSONTyped,
+    CharityActionModelToJSON,
+    CharityActionModelToJSONTyped,
+} from './CharityActionModel';
 import type { PlayerModel } from './PlayerModel';
 import {
     PlayerModelFromJSON,
@@ -27,6 +48,13 @@ import {
     PlayerModelToJSON,
     PlayerModelToJSONTyped,
 } from './PlayerModel';
+import type { DealActionModel } from './DealActionModel';
+import {
+    DealActionModelFromJSON,
+    DealActionModelFromJSONTyped,
+    DealActionModelToJSON,
+    DealActionModelToJSONTyped,
+} from './DealActionModel';
 
 /**
  * 
@@ -48,6 +76,12 @@ export interface GameModel {
     code?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof GameModel
+     */
+    currentPlayerId?: string;
+    /**
+     * 
      * @type {Array<PlayerModel>}
      * @memberof GameModel
      */
@@ -58,6 +92,30 @@ export interface GameModel {
      * @memberof GameModel
      */
     boardSpaces?: Array<BoardSpaceModel> | null;
+    /**
+     * 
+     * @type {ConfirmActionModel}
+     * @memberof GameModel
+     */
+    confirmAction?: ConfirmActionModel;
+    /**
+     * 
+     * @type {DealActionModel}
+     * @memberof GameModel
+     */
+    dealAction?: DealActionModel;
+    /**
+     * 
+     * @type {MarketActionModel}
+     * @memberof GameModel
+     */
+    marketAction?: MarketActionModel;
+    /**
+     * 
+     * @type {CharityActionModel}
+     * @memberof GameModel
+     */
+    charityAction?: CharityActionModel;
 }
 
 /**
@@ -79,8 +137,13 @@ export function GameModelFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         
         'id': json['id'] == null ? undefined : json['id'],
         'code': json['code'] == null ? undefined : json['code'],
+        'currentPlayerId': json['currentPlayerId'] == null ? undefined : json['currentPlayerId'],
         'players': json['players'] == null ? undefined : ((json['players'] as Array<any>).map(PlayerModelFromJSON)),
         'boardSpaces': json['boardSpaces'] == null ? undefined : ((json['boardSpaces'] as Array<any>).map(BoardSpaceModelFromJSON)),
+        'confirmAction': json['confirmAction'] == null ? undefined : ConfirmActionModelFromJSON(json['confirmAction']),
+        'dealAction': json['dealAction'] == null ? undefined : DealActionModelFromJSON(json['dealAction']),
+        'marketAction': json['marketAction'] == null ? undefined : MarketActionModelFromJSON(json['marketAction']),
+        'charityAction': json['charityAction'] == null ? undefined : CharityActionModelFromJSON(json['charityAction']),
     };
 }
 
@@ -97,8 +160,13 @@ export function GameModelToJSONTyped(value?: GameModel | null, ignoreDiscriminat
         
         'id': value['id'],
         'code': value['code'],
+        'currentPlayerId': value['currentPlayerId'],
         'players': value['players'] == null ? undefined : ((value['players'] as Array<any>).map(PlayerModelToJSON)),
         'boardSpaces': value['boardSpaces'] == null ? undefined : ((value['boardSpaces'] as Array<any>).map(BoardSpaceModelToJSON)),
+        'confirmAction': ConfirmActionModelToJSON(value['confirmAction']),
+        'dealAction': DealActionModelToJSON(value['dealAction']),
+        'marketAction': MarketActionModelToJSON(value['marketAction']),
+        'charityAction': CharityActionModelToJSON(value['charityAction']),
     };
 }
 

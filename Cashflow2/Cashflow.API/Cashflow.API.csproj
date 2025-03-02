@@ -22,6 +22,8 @@
     <ItemGroup>
       <Content Remove="Resources\BoardSpaces.json" />
       <EmbeddedResource Include="Resources\Boards.json" />
+      <Content Remove="Resources\Doodads.json" />
+      <EmbeddedResource Include="Resources\Doodads.json" />
     </ItemGroup>
 
 </Project>

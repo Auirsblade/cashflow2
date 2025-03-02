@@ -1,4 +1,4 @@
-import {ref, watch} from 'vue'
+import { computed, ref, watch } from 'vue'
 import {defineStore} from 'pinia'
 import type {GameModel, GameResponseModel, PlayerModel, PlayerOptionsModel, ProfessionModel} from "@/apiClient";
 import {useSignalR, useSignalRInvoke, useSignalROn} from "@/lib/signalR";
@@ -6,7 +6,8 @@ import {useSignalR, useSignalRInvoke, useSignalROn} from "@/lib/signalR";
 export const useGameStateStore = defineStore('gameState', () => {
     const game = ref<GameModel>();
     const player = ref<PlayerModel>();
-    const playerOptions = ref<PlayerOptionsModel>()
+    const playerOptions = ref<PlayerOptionsModel>();
+    const myTurn = computed(() => player.value?.id == game.value?.currentPlayerId);
 
     const {start, connection, status} = useSignalR(import.meta.env.VITE_API_URL.concat("/gameHub"));
 
@@ -42,7 +43,22 @@ export const useGameStateStore = defineStore('gameState', () => {
 
     const {execute: invokeSelectProfession} = useSignalRInvoke(connection, 'SelectProfession');
     async function selectProfession(profession: ProfessionModel) {
-        await invokeSelectProfession(game.value?.code, player.value, profession);
+        await invokeSelectProfession(game.value?.code, player.value?.id, profession);
+    }
+
+    const {execute: invokeMovePlayer} = useSignalRInvoke(connection, 'MovePlayer');
+    async function movePlayer(spacesToMove: number) {
+        await invokeMovePlayer(game.value?.code, player.value?.id, spacesToMove);
+    }
+
+    const {execute: invokeEndTurn} = useSignalRInvoke(connection, 'EndTurn');
+    async function endTurn() {
+        await invokeEndTurn(game.value?.code, player.value?.id);
+    }
+
+    const {execute: invokeBuyCharity} = useSignalRInvoke(connection, 'BuyCharity');
+    async function buyCharity() {
+        await invokeBuyCharity(game.value?.code, player.value?.id);
     }
 
     useSignalROn(connection, 'GameStateUpdated', ([gameModel]: [GameModel | undefined]
@@ -60,5 +76,5 @@ export const useGameStateStore = defineStore('gameState', () => {
         console.log(message);
     });
 
-    return { game, player, playerOptions, createGame, joinGame, selectProfession }
+    return { game, player, playerOptions, myTurn, createGame, joinGame, selectProfession, movePlayer, endTurn, buyCharity }
 })

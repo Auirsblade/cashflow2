@@ -2,11 +2,17 @@ apis/GameClientApi.ts
 apis/GameHubApi.ts
 apis/index.ts
 index.ts
+models/ActionTypeModel.ts
 models/AssetModel.ts
 models/BoardSpaceModel.ts
+models/CharityActionModel.ts
+models/ConfirmActionModel.ts
+models/DealActionModel.ts
+models/DoodadModel.ts
 models/GameModel.ts
 models/GameResponseModel.ts
 models/LiabilityModel.ts
+models/MarketActionModel.ts
 models/PlayerModel.ts
 models/PlayerOptionsModel.ts
 models/ProfessionModel.ts

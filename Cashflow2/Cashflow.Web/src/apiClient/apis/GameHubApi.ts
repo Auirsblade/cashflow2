@@ -37,6 +37,12 @@ export interface HubsGameHubJoinGamePostRequest {
     gameCode?: string;
 }
 
+export interface HubsGameHubMovePlayerPostRequest {
+    gameCode?: string;
+    player?: Omit<PlayerModel, 'income'|'taxes'|'childExpenses'|'expenses'|'netIncome'>;
+    spacesToMove?: number;
+}
+
 export interface HubsGameHubSelectProfessionPostRequest {
     gameCode?: string;
     player?: Omit<PlayerModel, 'income'|'taxes'|'childExpenses'|'expenses'|'netIncome'>;
@@ -106,6 +112,41 @@ export class GameHubApi extends runtime.BaseAPI {
     async hubsGameHubJoinGamePost(requestParameters: HubsGameHubJoinGamePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GameResponseModel> {
         const response = await this.hubsGameHubJoinGamePostRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async hubsGameHubMovePlayerPostRaw(requestParameters: HubsGameHubMovePlayerPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['player'] != null) {
+            queryParameters['player'] = requestParameters['player'];
+        }
+
+        if (requestParameters['spacesToMove'] != null) {
+            queryParameters['spacesToMove'] = requestParameters['spacesToMove'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/MovePlayer`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubMovePlayerPost(requestParameters: HubsGameHubMovePlayerPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubMovePlayerPostRaw(requestParameters, initOverrides);
     }
 
     /**

@@ -14,13 +14,10 @@
 
     interface RollResult {
         /** String describing the dice rolled (e.g., "1d6") */
-        dice: string;
-
-        /** Array of numbers representing the result of the roll */
-        values: number[];
+        dieType: string;
 
         /** Total sum of all dice rolled */
-        total: number;
+        value: number;
     }
 
     class DiceBox {
@@ -41,7 +38,7 @@
          * @param diceNotation A dice notation string, e.g., "1d6" or "2d20 + 4"
          * @returns A promise with the results of the roll
          */
-        roll(diceNotation: string): Promise<RollResult>;
+        roll(diceNotation: string): Promise<Array<RollResult>>;
 
         /**
          * Clears the current dice from the view
