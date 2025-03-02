@@ -36,7 +36,7 @@ public class Player(string name)
     public void Downsized()
     {
         Cash -= Expenses;
-        DownsizedTurnsRemaining = 2;
+        DownsizedTurnsRemaining = 3;
         CharityTurnsRemaining = 0;
     }
 
@@ -58,6 +58,17 @@ public class Player(string name)
     {
         CharityTurnsRemaining = 2;
         Cash -= Income * 0.10M;
+    }
+
+    public void BuyAsset(Asset deal)
+    {
+        Assets.Add(deal);
+    }
+
+    public void SellAsset(PurchaseOffer purchaseOffer, Asset asset)
+    {
+        Assets.Remove(asset);
+        Cash += purchaseOffer.Price * ((asset.Quantity ?? 0) > 0 ? asset.Quantity : 1) - asset.LoanAmount ?? 0;
     }
 }
 

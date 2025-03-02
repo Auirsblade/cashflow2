@@ -4,6 +4,7 @@ apis/index.ts
 index.ts
 models/ActionTypeModel.ts
 models/AssetModel.ts
+models/AssetTypeModel.ts
 models/BoardSpaceModel.ts
 models/CharityActionModel.ts
 models/ConfirmActionModel.ts
@@ -16,5 +17,6 @@ models/MarketActionModel.ts
 models/PlayerModel.ts
 models/PlayerOptionsModel.ts
 models/ProfessionModel.ts
+models/PurchaseOfferModel.ts
 models/index.ts
 runtime.ts

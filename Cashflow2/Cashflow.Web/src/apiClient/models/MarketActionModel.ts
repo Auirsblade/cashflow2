@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { PurchaseOfferModel } from './PurchaseOfferModel';
+import {
+    PurchaseOfferModelFromJSON,
+    PurchaseOfferModelFromJSONTyped,
+    PurchaseOfferModelToJSON,
+    PurchaseOfferModelToJSONTyped,
+} from './PurchaseOfferModel';
 import type { ActionTypeModel } from './ActionTypeModel';
 import {
     ActionTypeModelFromJSON,
@@ -45,6 +52,18 @@ export interface MarketActionModel {
      * @memberof MarketActionModel
      */
     readonly isAnyPlayer?: boolean;
+    /**
+     * 
+     * @type {PurchaseOfferModel}
+     * @memberof MarketActionModel
+     */
+    purchaseOffer?: PurchaseOfferModel;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof MarketActionModel
+     */
+    playersResponded?: Set<string> | null;
 }
 
 
@@ -69,6 +88,8 @@ export function MarketActionModelFromJSONTyped(json: any, ignoreDiscriminator: b
         'title': json['title'] == null ? undefined : json['title'],
         'name': json['name'] == null ? undefined : ActionTypeModelFromJSON(json['name']),
         'isAnyPlayer': json['isAnyPlayer'] == null ? undefined : json['isAnyPlayer'],
+        'purchaseOffer': json['purchaseOffer'] == null ? undefined : PurchaseOfferModelFromJSON(json['purchaseOffer']),
+        'playersResponded': json['playersResponded'] == null ? undefined : new Set(json['playersResponded']),
     };
 }
 
@@ -84,6 +105,8 @@ export function MarketActionModelToJSONTyped(value?: Omit<MarketActionModel, 'ti
     return {
         
         'name': ActionTypeModelToJSON(value['name']),
+        'purchaseOffer': PurchaseOfferModelToJSON(value['purchaseOffer']),
+        'playersResponded': value['playersResponded'] == null ? undefined : Array.from(value['playersResponded'] as Set<any>),
     };
 }
 

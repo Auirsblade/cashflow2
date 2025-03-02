@@ -81,6 +81,47 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         await Clients.Group(game.Code).GameStateUpdated(game);
     }
 
+    public async Task BuyDeal(string gameCode, Guid playerId)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.BuyDeal(game, player);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    public async Task SellDeal(string gameCode, Guid playerId)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.SellDeal(game, player);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    public async Task SellToMarket(string gameCode, Guid playerId, Guid assetId)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (await ValidateAssetExistence(player, assetId) is not { } asset) return;
+
+        gameService.SellToMarket(game, player, asset);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    public async Task MarketPass(string gameCode, Guid playerId)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.MarketPass(game, player);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
     private async Task<Game?> ValidateGameExistence(string gameCode)
     {
         Game? game = gameService.GetGame(gameCode);
@@ -96,6 +137,15 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         if (player != null) return player;
 
         await Clients.Client(Context.ConnectionId).Error("Player not found");
+        return null;
+    }
+
+    private async Task<Asset?> ValidateAssetExistence(Player player, Guid assetId)
+    {
+        Asset? asset = player.Assets.Find(x => x.Id == assetId);
+        if (asset != null) return asset;
+
+        await Clients.Client(Context.ConnectionId).Error("Asset not found");
         return null;
     }
 }

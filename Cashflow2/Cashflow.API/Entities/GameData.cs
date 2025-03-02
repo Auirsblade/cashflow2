@@ -70,10 +70,12 @@ public class DealAction : GameAction
     public Asset? Asset { get; set; }
 }
 
-public class MarketAction : GameAction
+public class MarketAction(PurchaseOffer purchaseOffer) : GameAction
 {
     public override ActionType Name => ActionType.Market;
     public override bool IsAnyPlayer => true;
+    public PurchaseOffer PurchaseOffer { get; set; } = purchaseOffer;
+    public HashSet<Guid> PlayersResponded { get; set; } = [];
 }
 
 public class CharityAction : GameAction

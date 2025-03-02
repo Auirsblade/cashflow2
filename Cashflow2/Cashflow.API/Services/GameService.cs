@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Cashflow.API.Entities;
+using Cashflow.API.Resources;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Cashflow.API.Services;
@@ -12,6 +13,7 @@ public class GameService(IMemoryCache gameCache)
     {
         Game game = new();
         game.Players.Add(creator);
+        game.CurrentPlayerId = creator.Id;
 
         gameCache.Set(game.Code, game);
 
@@ -51,13 +53,16 @@ public class GameService(IMemoryCache gameCache)
                 game.DealAction = new DealAction();
                 break;
             case "market":
-                game.MarketAction = new MarketAction();
+                game.MarketAction = new MarketAction(MarketGenerator.GenerateAssetOffer());
                 break;
             case "doodad":
                 List<Doodad> doodads = JsonSerializer.Deserialize<List<Doodad>>(File.ReadAllText(@"./Resources/Doodads.json")) ?? [];
                 Doodad doodad = doodads[new Random().Next(0, doodads.Count)];
                 player.BuyDoodad(doodad);
-                game.ConfirmAction = new ConfirmAction(ActionType.Doodad);
+                game.ConfirmAction = new ConfirmAction(ActionType.Doodad)
+                {
+                    Doodad = doodad
+                };
                 break;
             case "charity":
                 game.CharityAction = new CharityAction();
@@ -84,11 +89,47 @@ public class GameService(IMemoryCache gameCache)
 
     public void GetDeal(Game game, Player player, bool isBig)
     {
-        Deals? deals = JsonSerializer.Deserialize<Deals>(File.ReadAllText(@"./Resources/Deals.json"));
-        Random random = new();
-        Asset? deal = isBig ? deals?.Big[random.Next(0, deals.Big.Count)] : deals?.Small[random.Next(0, deals.Small.Count)];
+        Asset deal;
+        bool goodDeal;
+        do
+        {
+            deal = isBig ? AssetGenerator.GenerateBigDeal() : AssetGenerator.GenerateSmallDeal();
+
+            goodDeal = deal.Type is not (var type and (AssetType.mlm1 or AssetType.mlm2)) || player.Assets.All(x => x.Type != type);
+        } while (!goodDeal);
+
         if (game.DealAction != null) game.DealAction.Asset = deal;
 
+        gameCache.Set(game.Code, game);
+    }
+
+    public void BuyDeal(Game game, Player player)
+    {
+        Asset? deal = game.DealAction?.Asset;
+        if (deal == null) return;
+
+        player.BuyAsset(deal);
+        CycleTurn(game, player);
+        gameCache.Set(game.Code, game);
+    }
+
+    public void SellDeal(Game game, Player player)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SellToMarket(Game game, Player player, Asset asset)
+    {
+        if (game.MarketAction != null) player.SellAsset(game.MarketAction.PurchaseOffer, asset);
+        game.MarketAction?.PlayersResponded.Add(player.Id);
+        if (game.MarketAction?.PlayersResponded.Count == game.Players.Count) CycleTurn(game, game.Players.First(x => x.Id == game.CurrentPlayerId));
+        gameCache.Set(game.Code, game);
+    }
+
+    public void MarketPass(Game game, Player player)
+    {
+        game.MarketAction?.PlayersResponded.Add(player.Id);
+        if (game.MarketAction?.PlayersResponded.Count == game.Players.Count) CycleTurn(game, game.Players.First(x => x.Id == game.CurrentPlayerId));
         gameCache.Set(game.Code, game);
     }
 
@@ -112,7 +153,7 @@ public class GameService(IMemoryCache gameCache)
 
     private void CycleTurn(Game game, Player player)
     {
-        int playerIndex = game.Players.IndexOf(player);
+        int playerIndex = game.Players.IndexOf(player) + 1;
         if (playerIndex == game.Players.Count) playerIndex = 0;
         game.CurrentPlayerId = game.Players[playerIndex].Id;
         game.ConfirmAction = null;

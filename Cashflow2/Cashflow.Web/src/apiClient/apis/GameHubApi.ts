@@ -16,20 +16,38 @@
 import * as runtime from '../runtime';
 import type {
   GameResponseModel,
-  PlayerModel,
   ProfessionModel,
 } from '../models/index';
 import {
     GameResponseModelFromJSON,
     GameResponseModelToJSON,
-    PlayerModelFromJSON,
-    PlayerModelToJSON,
     ProfessionModelFromJSON,
     ProfessionModelToJSON,
 } from '../models/index';
 
+export interface HubsGameHubBuyCharityPostRequest {
+    gameCode?: string;
+    playerId?: string;
+}
+
+export interface HubsGameHubBuyDealPostRequest {
+    gameCode?: string;
+    playerId?: string;
+}
+
 export interface HubsGameHubCreateGamePostRequest {
     playerName?: string;
+}
+
+export interface HubsGameHubEndTurnPostRequest {
+    gameCode?: string;
+    playerId?: string;
+}
+
+export interface HubsGameHubGetDealPostRequest {
+    gameCode?: string;
+    playerId?: string;
+    isBig?: boolean;
 }
 
 export interface HubsGameHubJoinGamePostRequest {
@@ -37,22 +55,100 @@ export interface HubsGameHubJoinGamePostRequest {
     gameCode?: string;
 }
 
+export interface HubsGameHubMarketPassPostRequest {
+    gameCode?: string;
+    playerId?: string;
+}
+
 export interface HubsGameHubMovePlayerPostRequest {
     gameCode?: string;
-    player?: Omit<PlayerModel, 'income'|'taxes'|'childExpenses'|'expenses'|'netIncome'>;
+    playerId?: string;
     spacesToMove?: number;
 }
 
 export interface HubsGameHubSelectProfessionPostRequest {
     gameCode?: string;
-    player?: Omit<PlayerModel, 'income'|'taxes'|'childExpenses'|'expenses'|'netIncome'>;
+    playerId?: string;
     profession?: ProfessionModel;
+}
+
+export interface HubsGameHubSellDealPostRequest {
+    gameCode?: string;
+    playerId?: string;
+}
+
+export interface HubsGameHubSellToMarketPostRequest {
+    gameCode?: string;
+    playerId?: string;
+    assetId?: string;
 }
 
 /**
  * 
  */
 export class GameHubApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async hubsGameHubBuyCharityPostRaw(requestParameters: HubsGameHubBuyCharityPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/BuyCharity`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubBuyCharityPost(requestParameters: HubsGameHubBuyCharityPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubBuyCharityPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async hubsGameHubBuyDealPostRaw(requestParameters: HubsGameHubBuyDealPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/BuyDeal`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubBuyDealPost(requestParameters: HubsGameHubBuyDealPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubBuyDealPostRaw(requestParameters, initOverrides);
+    }
 
     /**
      */
@@ -80,6 +176,72 @@ export class GameHubApi extends runtime.BaseAPI {
     async hubsGameHubCreateGamePost(requestParameters: HubsGameHubCreateGamePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GameResponseModel> {
         const response = await this.hubsGameHubCreateGamePostRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async hubsGameHubEndTurnPostRaw(requestParameters: HubsGameHubEndTurnPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/EndTurn`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubEndTurnPost(requestParameters: HubsGameHubEndTurnPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubEndTurnPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async hubsGameHubGetDealPostRaw(requestParameters: HubsGameHubGetDealPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        if (requestParameters['isBig'] != null) {
+            queryParameters['isBig'] = requestParameters['isBig'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/GetDeal`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubGetDealPost(requestParameters: HubsGameHubGetDealPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubGetDealPostRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -116,6 +278,37 @@ export class GameHubApi extends runtime.BaseAPI {
 
     /**
      */
+    async hubsGameHubMarketPassPostRaw(requestParameters: HubsGameHubMarketPassPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/MarketPass`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubMarketPassPost(requestParameters: HubsGameHubMarketPassPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubMarketPassPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async hubsGameHubMovePlayerPostRaw(requestParameters: HubsGameHubMovePlayerPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -123,8 +316,8 @@ export class GameHubApi extends runtime.BaseAPI {
             queryParameters['gameCode'] = requestParameters['gameCode'];
         }
 
-        if (requestParameters['player'] != null) {
-            queryParameters['player'] = requestParameters['player'];
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
         }
 
         if (requestParameters['spacesToMove'] != null) {
@@ -158,8 +351,8 @@ export class GameHubApi extends runtime.BaseAPI {
             queryParameters['gameCode'] = requestParameters['gameCode'];
         }
 
-        if (requestParameters['player'] != null) {
-            queryParameters['player'] = requestParameters['player'];
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
         }
 
         if (requestParameters['profession'] != null) {
@@ -182,6 +375,72 @@ export class GameHubApi extends runtime.BaseAPI {
      */
     async hubsGameHubSelectProfessionPost(requestParameters: HubsGameHubSelectProfessionPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.hubsGameHubSelectProfessionPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async hubsGameHubSellDealPostRaw(requestParameters: HubsGameHubSellDealPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/SellDeal`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubSellDealPost(requestParameters: HubsGameHubSellDealPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubSellDealPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async hubsGameHubSellToMarketPostRaw(requestParameters: HubsGameHubSellToMarketPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        if (requestParameters['assetId'] != null) {
+            queryParameters['assetId'] = requestParameters['assetId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/SellToMarket`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubSellToMarketPost(requestParameters: HubsGameHubSellToMarketPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubSellToMarketPostRaw(requestParameters, initOverrides);
     }
 
 }

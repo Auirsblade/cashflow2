@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { AssetTypeModel } from './AssetTypeModel';
+import {
+    AssetTypeModelFromJSON,
+    AssetTypeModelFromJSONTyped,
+    AssetTypeModelToJSON,
+    AssetTypeModelToJSONTyped,
+} from './AssetTypeModel';
+
 /**
  * 
  * @export
@@ -24,7 +32,31 @@ export interface AssetModel {
      * @type {string}
      * @memberof AssetModel
      */
+    id?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssetModel
+     */
     name?: string | null;
+    /**
+     * 
+     * @type {AssetTypeModel}
+     * @memberof AssetModel
+     */
+    type?: AssetTypeModel;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssetModel
+     */
+    quantity?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssetModel
+     */
+    equity?: number;
     /**
      * 
      * @type {number}
@@ -42,8 +74,16 @@ export interface AssetModel {
      * @type {number}
      * @memberof AssetModel
      */
+    readonly loanAmount?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssetModel
+     */
     readonly income?: number;
 }
+
+
 
 /**
  * Check if a given object implements the AssetModel interface.
@@ -62,9 +102,14 @@ export function AssetModelFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
+        'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'] == null ? undefined : json['name'],
+        'type': json['type'] == null ? undefined : AssetTypeModelFromJSON(json['type']),
+        'quantity': json['quantity'] == null ? undefined : json['quantity'],
+        'equity': json['equity'] == null ? undefined : json['equity'],
         'value': json['value'] == null ? undefined : json['value'],
         'rateOfReturn': json['rateOfReturn'] == null ? undefined : json['rateOfReturn'],
+        'loanAmount': json['loanAmount'] == null ? undefined : json['loanAmount'],
         'income': json['income'] == null ? undefined : json['income'],
     };
 }
@@ -73,14 +118,18 @@ export function AssetModelToJSON(json: any): AssetModel {
     return AssetModelToJSONTyped(json, false);
 }
 
-export function AssetModelToJSONTyped(value?: Omit<AssetModel, 'income'> | null, ignoreDiscriminator: boolean = false): any {
+export function AssetModelToJSONTyped(value?: Omit<AssetModel, 'loanAmount'|'income'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'name': value['name'],
+        'type': AssetTypeModelToJSON(value['type']),
+        'quantity': value['quantity'],
+        'equity': value['equity'],
         'value': value['value'],
         'rateOfReturn': value['rateOfReturn'],
     };

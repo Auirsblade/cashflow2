@@ -9,10 +9,29 @@ public static class FinancialConstants
     public const int CREDIT_CARD_TERM = 2;
 }
 
+public enum AssetType
+{
+    mlm1,
+    mlm2,
+    business,
+    twoOne,
+    threeTwo,
+    apartment,
+    cd,
+    land,
+    gold
+}
+
 public class Asset
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; }
-    public string Type { get; set; }
+    public AssetType Type { get; set; }
+    public int? Quantity { get; set; }
+
+    /// <summary>
+    /// Equity in the Asset, also used as Cost
+    /// </summary>
     public decimal Equity { get; set; }
     public decimal Value { get; set; }
     public decimal RateOfReturn { get; set; }
@@ -35,8 +54,9 @@ public class Liability
     private int _payments => Term * FinancialConstants.PAYMENTS_PER_ROUND;
 }
 
-public class Deals
+public class PurchaseOffer
 {
-    public List<Asset> Big { get; set; }
-    public List<Asset> Small { get; set; }
+    public string Name { get; set; }
+    public AssetType Type { get; set; }
+    public decimal Price { get; set; }
 }

@@ -40,6 +40,12 @@
                     <div>{{ formatCurrency(player.income ?? 0) }}</div>
                 </div>
             </div>
+            <div class="sm:row-start-2 grid grid-cols-2">
+                <div class="font-bold">Passive Income:</div>
+                <div class="col-start-2 text-right font-bold">
+                    <div>{{ formatCurrency((player.income ?? 0) - (player.profession.salary ?? 0)) }}</div>
+                </div>
+            </div>
             <div class="grid grid-cols-2">
                 <div class="col-span-2 font-bold w-full">Expenses:</div>
                 <div class="ml-2">Taxes:</div>
@@ -59,7 +65,10 @@
                 <div class="col-start-2 text-right">
                     <div>{{ formatCurrency(player.profession.otherExpenses ?? 0) }}</div>
                 </div>
-                <div class="ml-2">Child Expenses:</div>
+                <div class="ml-2">
+                    Child Expenses:
+                    <span class="text-xs">{{player.numberOfChildren! > 0 ? player.numberOfChildren == 1 ? '(1 child)' : `(${player.numberOfChildren} children)` : ''}}</span>
+                </div>
                 <div class="col-start-2 text-right">
                     <div>{{ formatCurrency(player.childExpenses ?? 0) }}</div>
                 </div>
@@ -75,12 +84,6 @@
                     <div>{{ formatCurrency(player.netIncome ?? 0) }}</div>
                 </div>
             </div>
-<!--            <div class="sm:col-start-2 grid grid-cols-2">-->
-<!--                <div class="font-bold">Cash On Hand:</div>-->
-<!--                <div class="col-start-2 text-right font-bold">-->
-<!--                    <div>{{ formatCurrency(player.cash ?? 0) }}</div>-->
-<!--                </div>-->
-<!--            </div>-->
         </div>
     </div>
 </template>

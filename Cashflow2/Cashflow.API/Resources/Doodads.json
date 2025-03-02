@@ -1,326 +1,326 @@
 [
   {
-    "Title": "Buy new tennis racket",
+    "Name": "Buy new tennis racket",
     "Cost": 200
   },
   {
-    "Title": "Lunch with friends",
+    "Name": "Lunch with friends",
     "Cost": 40
   },
   {
-    "Title": "Wine country bike trip",
+    "Name": "Wine country bike trip",
     "Cost": 2000
   },
   {
-    "Title": "Purchase office chair",
+    "Name": "Purchase office chair",
     "Cost": 150
   },
   {
-    "Title": "Order customized cake",
+    "Name": "Order customized cake",
     "Cost": 90
   },
   {
-    "Title": "Buy new sneakers",
+    "Name": "Buy new sneakers",
     "Cost": 120
   },
   {
-    "Title": "Concert tickets",
+    "Name": "Concert tickets",
     "Cost": 300
   },
   {
-    "Title": "Sign up for yoga classes",
+    "Name": "Sign up for yoga classes",
     "Cost": 250
   },
   {
-    "Title": "Mountain camping trip",
+    "Name": "Mountain camping trip",
     "Cost": 1800
   },
   {
-    "Title": "Upgrade home WiFi router",
+    "Name": "Upgrade home WiFi router",
     "Cost": 120
   },
   {
-    "Title": "Purchase leather wallet",
+    "Name": "Purchase leather wallet",
     "Cost": 80
   },
   {
-    "Title": "Pay for car detailing",
+    "Name": "Pay for car detailing",
     "Cost": 200
   },
   {
-    "Title": "Weekend hotel stay",
+    "Name": "Weekend hotel stay",
     "Cost": 800
   },
   {
-    "Title": "Cooking workshop fee",
+    "Name": "Cooking workshop fee",
     "Cost": 350
   },
   {
-    "Title": "Gift a coffee machine",
+    "Name": "Gift a coffee machine",
     "Cost": 220
   },
   {
-    "Title": "New sunglasses",
+    "Name": "New sunglasses",
     "Cost": 100
   },
   {
-    "Title": "Bluetooth headphones",
+    "Name": "Bluetooth headphones",
     "Cost": 280
   },
   {
-    "Title": "Buy gaming mouse",
+    "Name": "Buy gaming mouse",
     "Cost": 60
   },
   {
-    "Title": "Surfing lessons",
+    "Name": "Surfing lessons",
     "Cost": 600
   },
   {
-    "Title": "Home decor painting",
+    "Name": "Home decor painting",
     "Cost": 75
   },
   {
-    "Title": "Monthly gym membership",
+    "Name": "Monthly gym membership",
     "Cost": 50
   },
   {
-    "Title": "Theme park tickets",
+    "Name": "Theme park tickets",
     "Cost": 400
   },
   {
-    "Title": "Spa treatment",
+    "Name": "Spa treatment",
     "Cost": 230
   },
   {
-    "Title": "Dinner at fancy restaurant",
+    "Name": "Dinner at fancy restaurant",
     "Cost": 300
   },
   {
-    "Title": "Replace car tires",
+    "Name": "Replace car tires",
     "Cost": 1250
   },
   {
-    "Title": "Order a bookshelf",
+    "Name": "Order a bookshelf",
     "Cost": 450
   },
   {
-    "Title": "Upgrade smartphone",
+    "Name": "Upgrade smartphone",
     "Cost": 2500
   },
   {
-    "Title": "Buy monthly planner",
+    "Name": "Buy monthly planner",
     "Cost": 30
   },
   {
-    "Title": "Pay for dance lessons",
+    "Name": "Pay for dance lessons",
     "Cost": 500
   },
   {
-    "Title": "Repair washing machine",
+    "Name": "Repair washing machine",
     "Cost": 280
   },
   {
-    "Title": "Annual park pass",
+    "Name": "Annual park pass",
     "Cost": 70
   },
   {
-    "Title": "New tablet device",
+    "Name": "New tablet device",
     "Cost": 1200
   },
   {
-    "Title": "Buy power tools set",
+    "Name": "Buy power tools set",
     "Cost": 900
   },
   {
-    "Title": "Pay for car oil change",
+    "Name": "Pay for car oil change",
     "Cost": 70
   },
   {
-    "Title": "Buy hiking boots",
+    "Name": "Buy hiking boots",
     "Cost": 190
   },
   {
-    "Title": "Board games for family",
+    "Name": "Board games for family",
     "Cost": 120
   },
   {
-    "Title": "Wedding gift for a friend",
+    "Name": "Wedding gift for a friend",
     "Cost": 220
   },
   {
-    "Title": "Holiday flight ticket",
+    "Name": "Holiday flight ticket",
     "Cost": 2500
   },
   {
-    "Title": "Senior fitness class",
+    "Name": "Senior fitness class",
     "Cost": 80
   },
   {
-    "Title": "Gift new watch",
+    "Name": "Gift new watch",
     "Cost": 500
   },
   {
-    "Title": "Pet grooming costs",
+    "Name": "Pet grooming costs",
     "Cost": 120
   },
   {
-    "Title": "Home theater setup",
+    "Name": "Home theater setup",
     "Cost": 2900
   },
   {
-    "Title": "Pay for photography session",
+    "Name": "Pay for photography session",
     "Cost": 600
   },
   {
-    "Title": "Buy running equipment",
+    "Name": "Buy running equipment",
     "Cost": 350
   },
   {
-    "Title": "Pay for online streaming",
+    "Name": "Pay for online streaming",
     "Cost": 25
   },
   {
-    "Title": "Purchase new curtains",
+    "Name": "Purchase new curtains",
     "Cost": 100
   },
   {
-    "Title": "Hotel by the beach",
+    "Name": "Hotel by the beach",
     "Cost": 1800
   },
   {
-    "Title": "Photography gear bag",
+    "Name": "Photography gear bag",
     "Cost": 150
   },
   {
-    "Title": "Gift card for books",
+    "Name": "Gift card for books",
     "Cost": 100
   },
   {
-    "Title": "Book a private chef",
+    "Name": "Book a private chef",
     "Cost": 900
   },
   {
-    "Title": "Annual spa membership fee",
+    "Name": "Annual spa membership fee",
     "Cost": 300
   },
   {
-    "Title": "Buy scented candles",
+    "Name": "Buy scented candles",
     "Cost": 25
   },
   {
-    "Title": "Purchase wall poster",
+    "Name": "Purchase wall poster",
     "Cost": 30
   },
   {
-    "Title": "New phone case",
+    "Name": "New phone case",
     "Cost": 20
   },
   {
-    "Title": "Reusable water bottle",
+    "Name": "Reusable water bottle",
     "Cost": 40
   },
   {
-    "Title": "Colorful throw pillows",
+    "Name": "Colorful throw pillows",
     "Cost": 50
   },
   {
-    "Title": "Notebook and pens",
+    "Name": "Notebook and pens",
     "Cost": 30
   },
   {
-    "Title": "Buy art supplies",
+    "Name": "Buy art supplies",
     "Cost": 45
   },
   {
-    "Title": "Kitchen utensils set",
+    "Name": "Kitchen utensils set",
     "Cost": 60
   },
   {
-    "Title": "Cozy blanket",
+    "Name": "Cozy blanket",
     "Cost": 75
   },
   {
-    "Title": "Decorative vase",
+    "Name": "Decorative vase",
     "Cost": 80
   },
   {
-    "Title": "Pack of board markers",
+    "Name": "Pack of board markers",
     "Cost": 20
   },
   {
-    "Title": "Portable coffee mug",
+    "Name": "Portable coffee mug",
     "Cost": 35
   },
   {
-    "Title": "Set of tea towels",
+    "Name": "Set of tea towels",
     "Cost": 25
   },
   {
-    "Title": "Buy stylish keychains",
+    "Name": "Buy stylish keychains",
     "Cost": 20
   },
   {
-    "Title": "Indoor potted plant",
+    "Name": "Indoor potted plant",
     "Cost": 50
   },
   {
-    "Title": "Handmade soap",
+    "Name": "Handmade soap",
     "Cost": 25
   },
   {
-    "Title": "Pair of slippers",
+    "Name": "Pair of slippers",
     "Cost": 30
   },
   {
-    "Title": "Eco-friendly tote bag",
+    "Name": "Eco-friendly tote bag",
     "Cost": 35
   },
   {
-    "Title": "Decorative fairy lights",
+    "Name": "Decorative fairy lights",
     "Cost": 40
   },
   {
-    "Title": "Desk organizer",
+    "Name": "Desk organizer",
     "Cost": 45
   },
   {
-    "Title": "Mini whiteboard",
+    "Name": "Mini whiteboard",
     "Cost": 30
   },
   {
-    "Title": "Set of coasters",
+    "Name": "Set of coasters",
     "Cost": 25
   },
   {
-    "Title": "Novelty socks",
+    "Name": "Novelty socks",
     "Cost": 20
   },
   {
-    "Title": "Sketchbook",
+    "Name": "Sketchbook",
     "Cost": 35
   },
   {
-    "Title": "Ceramic coffee mugs",
+    "Name": "Ceramic coffee mugs",
     "Cost": 55
   },
   {
-    "Title": "Pack of colored pencils",
+    "Name": "Pack of colored pencils",
     "Cost": 30
   },
   {
-    "Title": "Travel size toiletries",
+    "Name": "Travel size toiletries",
     "Cost": 40
   },
   {
-    "Title": "Fridge magnets",
+    "Name": "Fridge magnets",
     "Cost": 20
   },
   {
-    "Title": "Desktop plant holder",
+    "Name": "Desktop plant holder",
     "Cost": 50
   },
   {
-    "Title": "Small picture frame",
+    "Name": "Small picture frame",
     "Cost": 60
   }
 ]
