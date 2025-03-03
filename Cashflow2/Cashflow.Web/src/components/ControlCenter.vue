@@ -58,7 +58,7 @@
                         <div>{{ formatCurrency(liability.expense ?? 0) }}</div>
                     </div>
                 </template>
-                <template v-for="i in [...Array(maxLineItems - (player.liabilities?.length ?? 0) - 2)]" :key="i">
+                <template v-for="i in [...Array((maxLineItems - (player.liabilities?.length ?? 0) - 2) > 0 ? (maxLineItems - (player.liabilities?.length ?? 0) - 2) : 0)]" :key="i">
                     <div class="h-6 max-sm:hidden"/><div class="h-6 max-sm:hidden"/>
                 </template>
                 <div class="ml-2">Other Expenses:</div>

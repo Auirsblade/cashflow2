@@ -175,7 +175,7 @@
                         class="col-span-2 md:col-span-4 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Buy Deal
                 </Button>
                 <Button @click="sellDeal" disabled class="min-h-10 col-span-2 bg-green-200 dark:bg-green-800 hover:bg-green-500">Sell Deal</Button>
-                <Button @click="confirmAction" class="min-h-10 col-span-2 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500">Pass</Button>
+                <Button @click="confirmAction" class="min-h-10 col-span-2 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500" :disabled="!myTurn">Pass</Button>
             </div>
         </div>
         <div v-else-if="game!.charityAction" class="m-auto">
