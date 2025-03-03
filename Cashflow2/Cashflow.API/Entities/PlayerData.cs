@@ -63,6 +63,7 @@ public class Player(string name)
     public void BuyAsset(Asset deal)
     {
         Assets.Add(deal);
+        Cash -= deal.Equity;
     }
 
     public void SellAsset(PurchaseOffer purchaseOffer, Asset asset)

@@ -239,6 +239,7 @@
                                     Profit from sale:
                                 </div>
                                 <div>
+<!--                                    TODO: update this to update per-unit prices -->
                                     {{ formatCurrency(game!.marketAction!.purchaseOffer!.price! - (asset.loanAmount ?? 0)) }}
                                 </div>
                             </div>
