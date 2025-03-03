@@ -26,6 +26,7 @@
     });
 
     const roll = async () => {
+        if (!diceLoaded.value) return;
         hideRollText.value = true;
         let diceRoll = await diceBox.roll(diceToRoll + 'd6');
         let total = diceRoll.map(x => x.value).reduce((a, b) => a + b, 0);
@@ -34,7 +35,7 @@
 </script>
 
 <template>
-    <div id="diceZone" class="h-full text-center relative" @click="roll">
+    <div id="diceZone" class="h-full text-center relative" @click="roll" :disabled="!diceLoaded">
         <div :hidden="hideRollText" class="absolute inset-0 flex items-center justify-center z-0">Click to Roll!</div>
     </div>
 </template>

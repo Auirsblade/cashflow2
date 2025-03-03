@@ -171,7 +171,7 @@
                 <div class="col-span-1 ml-auto">{{ formatCurrency(game!.dealAction.asset.equity ?? 0) }}</div>
                 <div class="col-span-1 ml-auto">Cash Flow:</div>
                 <div class="col-span-1 ml-auto">{{ formatCurrency(game!.dealAction.asset.income ?? 0) }}</div>
-                <Button @click="buyDeal" :disabled="(game!.dealAction.asset?.equity ?? 0) > player!.cash!"
+                <Button @click="buyDeal" :disabled="(game!.dealAction.asset?.equity ?? 0) > player!.cash! || !myTurn"
                         class="col-span-2 md:col-span-4 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Buy Deal
                 </Button>
                 <Button @click="sellDeal" disabled class="min-h-10 col-span-2 bg-green-200 dark:bg-green-800 hover:bg-green-500">Sell Deal</Button>
