@@ -13,25 +13,38 @@
 
     let diceBox: DiceBox;
     const diceLoaded = ref(false);
-    const hideRollText = ref(false);
-    onMounted(async () => {
-        diceBox = new DiceBox({
-            id: 'dice-canvas',
-            assetPath: '/assets/dice/',
-            container: '#diceZone',
-            scale: 9
-        });
-        await diceBox.init();
-        diceLoaded.value = true;
-    });
+const hideRollText = ref(false);
+const rolling = ref(false);
 
-    const roll = async () => {
-        if (!diceLoaded.value) return;
-        hideRollText.value = true;
-        let diceRoll = await diceBox.roll(diceToRoll + 'd6');
-        let total = diceRoll.map(x => x.value).reduce((a, b) => a + b, 0);
-        emit('diceRolled', total);
-    };
+onMounted(async () => {
+  diceBox = new DiceBox({
+    id: 'dice-canvas',
+    assetPath: '/assets/dice/',
+    container: '#diceZone',
+    scale: 9
+  });
+  await diceBox.init();
+  diceLoaded.value = true;
+});
+
+const safeDiceSpec = () => {
+  const n = Number.isFinite(diceToRoll) ? Math.floor(diceToRoll) : 0;
+  const clamped = Math.min(Math.max(n, 1), 20); // prevent abuse
+  return `${clamped}d6`;
+};
+
+const roll = async () => {
+  if (!diceLoaded.value || rolling.value) return;
+  rolling.value = true;
+  try {
+    hideRollText.value = true;
+    const diceRoll = await diceBox.roll(safeDiceSpec());
+    const total = (diceRoll ?? []).map(x => x?.value ?? 0).reduce((a, b) => a + b, 0);
+    emit('diceRolled', total);
+  } finally {
+    rolling.value = false;
+  }
+};
 </script>
 
 <template>
