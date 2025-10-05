@@ -22,6 +22,16 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return null;
 
+        // Check if player with the same name already exists in the game
+        Player? existingPlayer = game.Players.Find(x => x.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
+        
+        if (existingPlayer != null)
+        {
+            // Player already exists, return existing player instead of creating new one
+            await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
+            return new GameResponse { Player = existingPlayer, Game = game, PlayerOptions = new PlayerOptions() };
+        }
+
         Player player = new(playerName);
         gameService.JoinGame(player, game);
 
