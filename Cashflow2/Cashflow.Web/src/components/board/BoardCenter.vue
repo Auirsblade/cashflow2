@@ -17,7 +17,7 @@
     import { Icon } from "@iconify/vue";
 
     const gameState = useGameStateStore();
-    const { game, player, myTurn } = storeToRefs(gameState);
+    const { game, player, myTurn, error } = storeToRefs(gameState);
 
     const hasCharity = computed(() => (player.value?.charityTurnsRemaining ?? 0) > 0)
     const diceToRoll = ref(1);
@@ -89,6 +89,9 @@
 </script>
 
 <template>
+    <div v-if="error" class="absolute top-2 left-1/2 -translate-x-1/2 z-50 bg-red-500 text-white px-4 py-2 rounded shadow-lg text-sm">
+        {{ error }}
+    </div>
     <div v-if="hasCharity && promptSelectCharity && rolled == 0 && myTurn" class="h-full">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-full m-2">
             <Button @click="chooseCharity(true)"

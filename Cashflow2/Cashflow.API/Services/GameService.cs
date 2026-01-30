@@ -34,9 +34,19 @@ public class GameService(IMemoryCache gameCache)
 
     public void MovePlayer(Game game, Player player, int spacesToMove)
     {
+        if (player.DownsizedTurnsRemaining > 0) return;
+
         int currentSpaceId = player.BoardSpaceId;
         int newSpaceId = getNewSpaceId(currentSpaceId, spacesToMove);
-        if (game.BoardSpaces?.Any(x => x.Id > currentSpaceId && x.Id < newSpaceId && x.Name != null && x.Name.Equals("payday", StringComparison.OrdinalIgnoreCase)) ?? false)
+        bool wrapping = newSpaceId <= currentSpaceId;
+        bool passedPayday = wrapping
+            ? game.BoardSpaces?.Any(x =>
+                ((x.Id > currentSpaceId && x.Id <= 24) || (x.Id >= 1 && x.Id < newSpaceId)) &&
+                x.Name != null && x.Name.Equals("payday", StringComparison.OrdinalIgnoreCase)) ?? false
+            : game.BoardSpaces?.Any(x =>
+                x.Id > currentSpaceId && x.Id < newSpaceId &&
+                x.Name != null && x.Name.Equals("payday", StringComparison.OrdinalIgnoreCase)) ?? false;
+        if (passedPayday)
         {
             player.Payday();
         }
@@ -57,7 +67,7 @@ public class GameService(IMemoryCache gameCache)
                 break;
             case "doodad":
                 List<Doodad> doodads = JsonSerializer.Deserialize<List<Doodad>>(File.ReadAllText(@"./Resources/Doodads.json")) ?? [];
-                Doodad doodad = doodads[new Random().Next(0, doodads.Count)];
+                Doodad doodad = doodads[Random.Shared.Next(0, doodads.Count)];
                 player.BuyDoodad(doodad);
                 game.ConfirmAction = new ConfirmAction(ActionType.Doodad)
                 {
@@ -107,6 +117,7 @@ public class GameService(IMemoryCache gameCache)
     {
         Asset? deal = game.DealAction?.Asset;
         if (deal == null) return;
+        if (deal.Equity > player.Cash) return;
 
         player.BuyAsset(deal);
         CycleTurn(game, player);
@@ -115,21 +126,23 @@ public class GameService(IMemoryCache gameCache)
 
     public void SellDeal(Game game, Player player)
     {
-        throw new NotImplementedException();
+        // Not yet implemented — return gracefully instead of crashing
     }
 
     public void SellToMarket(Game game, Player player, Asset asset)
     {
-        if (game.MarketAction != null) player.SellAsset(game.MarketAction.PurchaseOffer, asset);
-        game.MarketAction?.PlayersResponded.Add(player.Id);
-        if (game.MarketAction?.PlayersResponded.Count == game.Players.Count) CycleTurn(game, game.Players.First(x => x.Id == game.CurrentPlayerId));
+        if (game.MarketAction == null) return;
+        if (!game.MarketAction.PlayersResponded.Add(player.Id)) return;
+        player.SellAsset(game.MarketAction.PurchaseOffer, asset);
+        if (game.MarketAction.PlayersResponded.Count == game.Players.Count) CycleTurn(game, game.Players.First(x => x.Id == game.CurrentPlayerId));
         gameCache.Set(game.Code, game);
     }
 
     public void MarketPass(Game game, Player player)
     {
-        game.MarketAction?.PlayersResponded.Add(player.Id);
-        if (game.MarketAction?.PlayersResponded.Count == game.Players.Count) CycleTurn(game, game.Players.First(x => x.Id == game.CurrentPlayerId));
+        if (game.MarketAction == null) return;
+        if (!game.MarketAction.PlayersResponded.Add(player.Id)) return;
+        if (game.MarketAction.PlayersResponded.Count == game.Players.Count) CycleTurn(game, game.Players.First(x => x.Id == game.CurrentPlayerId));
         gameCache.Set(game.Code, game);
     }
 

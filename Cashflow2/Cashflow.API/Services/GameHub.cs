@@ -55,6 +55,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;
         if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (!ValidateCurrentTurn(game, player)) return;
 
         gameService.MovePlayer(game, player, spacesToMove);
 
@@ -65,6 +66,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;
         if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (!ValidateCurrentTurn(game, player)) return;
 
         gameService.EndTurn(game, player);
 
@@ -75,6 +77,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;
         if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (!ValidateCurrentTurn(game, player)) return;
 
         gameService.BuyCharity(game, player);
 
@@ -85,6 +88,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;
         if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (!ValidateCurrentTurn(game, player)) return;
 
         gameService.GetDeal(game, player, isBig);
 
@@ -95,6 +99,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;
         if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (!ValidateCurrentTurn(game, player)) return;
 
         gameService.BuyDeal(game, player);
 
@@ -105,6 +110,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;
         if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (!ValidateCurrentTurn(game, player)) return;
 
         gameService.SellDeal(game, player);
 
@@ -130,6 +136,11 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         gameService.MarketPass(game, player);
 
         await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    private static bool ValidateCurrentTurn(Game game, Player player)
+    {
+        return player.Id == game.CurrentPlayerId;
     }
 
     private async Task<Game?> ValidateGameExistence(string gameCode)

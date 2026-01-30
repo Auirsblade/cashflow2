@@ -7,7 +7,8 @@ export const useGameStateStore = defineStore('gameState', () => {
     const game = ref<GameModel>();
     const player = ref<PlayerModel>();
     const playerOptions = ref<PlayerOptionsModel>();
-    const myTurn = ref(true);
+    const myTurn = ref(false);
+    const error = ref<string | null>(null);
 
     const { start, connection, status } = useSignalR(import.meta.env.VITE_API_URL.concat("/gameHub"));
 
@@ -17,6 +18,7 @@ export const useGameStateStore = defineStore('gameState', () => {
             game.value = gameResponse.game;
             player.value = gameResponse.player;
             playerOptions.value = gameResponse.playerOptions;
+            myTurn.value = gameResponse.game.currentPlayerId == player.value?.id;
         } else {
             console.log("Game failed to start");
             console.log(gameResponse.message);
@@ -110,8 +112,9 @@ export const useGameStateStore = defineStore('gameState', () => {
     });
 
     useSignalROn(connection, 'Error', ([message]: [string]) => {
-        console.log("Error received from server:");
-        console.log(message);
+        console.log("Error received from server:", message);
+        error.value = message;
+        setTimeout(() => { error.value = null; }, 5000);
     });
 
     return {
@@ -119,6 +122,7 @@ export const useGameStateStore = defineStore('gameState', () => {
         player,
         playerOptions,
         myTurn,
+        error,
         createGame,
         joinGame,
         selectProfession,
