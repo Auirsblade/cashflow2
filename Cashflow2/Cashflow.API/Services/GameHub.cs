@@ -73,6 +73,17 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         await Clients.Group(game.Code).GameStateUpdated(game);
     }
 
+    public async Task PayDoodad(string gameCode, Guid playerId, bool useCard)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (!ValidateCurrentTurn(game, player)) return;
+
+        gameService.PayDoodad(game, player, useCard);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
     public async Task BuyCharity(string gameCode, Guid playerId)
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;

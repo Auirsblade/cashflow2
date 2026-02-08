@@ -69,7 +69,6 @@ public class GameService(IMemoryCache gameCache)
             case "doodad":
                 List<Doodad> doodads = JsonSerializer.Deserialize<List<Doodad>>(File.ReadAllText(@"./Resources/Doodads.json")) ?? [];
                 Doodad doodad = doodads[Random.Shared.Next(0, doodads.Count)];
-                player.BuyDoodad(doodad);
                 game.ConfirmAction = new ConfirmAction(ActionType.Doodad)
                 {
                     Doodad = doodad
@@ -220,6 +219,41 @@ public class GameService(IMemoryCache gameCache)
 
     public void EndTurn(Game game, Player player)
     {
+        if (player.CharityTurnsRemaining > 0) player.CharityTurnsRemaining--;
+        if (player.DownsizedTurnsRemaining > 0) player.DownsizedTurnsRemaining--;
+        CycleTurn(game, player);
+        gameCache.Set(game.Code, game);
+    }
+
+    public void PayDoodad(Game game, Player player, bool useCard)
+    {
+        var doodad = game.ConfirmAction?.Doodad;
+        if (doodad == null) return;
+
+        if (useCard)
+        {
+            var card = player.Liabilities.FirstOrDefault(l => l.Term <= 0);
+            if (card != null)
+            {
+                card.Amount += doodad.Cost;
+            }
+            else
+            {
+                player.Liabilities.Add(new Liability
+                {
+                    Name = "Credit Card",
+                    Amount = doodad.Cost,
+                    InterestRate = 0.18m,
+                    Term = FinancialConstants.CREDIT_CARD_TERM
+                });
+            }
+        }
+        else
+        {
+            if (player.Cash < doodad.Cost) return;
+            player.Cash -= doodad.Cost;
+        }
+
         if (player.CharityTurnsRemaining > 0) player.CharityTurnsRemaining--;
         if (player.DownsizedTurnsRemaining > 0) player.DownsizedTurnsRemaining--;
         CycleTurn(game, player);

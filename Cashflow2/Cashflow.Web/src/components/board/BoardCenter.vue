@@ -49,6 +49,12 @@
         promptSelectCharity.value = true;
     }
 
+    const payDoodad = (useCard: boolean) => {
+        gameState.payDoodad(useCard);
+        rolled.value = 0;
+        promptSelectCharity.value = true;
+    }
+
     const buyCharity = () => {
         gameState.buyCharity();
         rolled.value = 0;
@@ -169,9 +175,14 @@
                 <div class="grid grid-cols-1 m-2 p-2 gap-2 rounded-md bg-slate-300 dark:bg-gray-800 shadow-md">
                     <div>{{ game!.confirmAction.doodad?.name }}</div>
                     <div>{{ formatCurrency(game!.confirmAction.doodad?.cost ?? 0) }}</div>
-                    <Button @click="confirmAction" class="min-h-24 bg-yellow-200 dark:bg-yellow-800 hover:bg-yellow-200/70 hover:dark:bg-yellow-800/80"
-                            :disabled="!myTurn">Bummer
-                    </Button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <Button @click="payDoodad(false)" class="min-h-24 bg-yellow-200 dark:bg-yellow-800 hover:bg-yellow-200/70 hover:dark:bg-yellow-800/80"
+                                :disabled="!myTurn || (player?.cash ?? 0) < (game!.confirmAction.doodad?.cost ?? 0)">Pay Cash
+                        </Button>
+                        <Button @click="payDoodad(true)" class="min-h-24 bg-orange-200 dark:bg-orange-800 hover:bg-orange-200/70 hover:dark:bg-orange-800/80"
+                                :disabled="!myTurn">Put on Card
+                        </Button>
+                    </div>
                 </div>
             </div>
             <div v-if="game!.confirmAction.title == 'Baby'" class="m-auto">

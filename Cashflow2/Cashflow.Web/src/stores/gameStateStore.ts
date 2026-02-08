@@ -112,6 +112,12 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokeMarketPass(game.value?.code, player.value?.id);
     }
 
+    const { execute: invokePayDoodad } = useSignalRInvoke(connection, 'PayDoodad');
+
+    async function payDoodad(useCard: boolean) {
+        await invokePayDoodad(game.value?.code, player.value?.id, useCard);
+    }
+
     const { execute: invokeBuyStock } = useSignalRInvoke(connection, 'BuyStock');
 
     async function buyStock(ticker: string, quantity: number) {
@@ -175,6 +181,7 @@ export const useGameStateStore = defineStore('gameState', () => {
         buyStock,
         sellStock,
         takeOutLoan,
-        payOffLoan
+        payOffLoan,
+        payDoodad
     }
 })
