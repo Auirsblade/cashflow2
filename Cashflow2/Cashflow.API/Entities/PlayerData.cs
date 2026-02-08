@@ -33,6 +33,7 @@ public class Player(string name)
     public void Payday()
     {
         Cash += NetIncome;
+        Liabilities.RemoveAll(l => l.ApplyMonthlyAmortization());
     }
 
     public void Downsized()

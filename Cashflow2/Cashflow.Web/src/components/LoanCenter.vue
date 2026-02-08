@@ -35,10 +35,13 @@ function payoffPreviewPayment(liability: LiabilityModel): number {
     const remaining = (liability.amount ?? 0) - amount;
     if (remaining <= 0) return 0;
     const rate = liability.interestRate ?? 0;
-    const term = liability.term ?? 1;
+    const term = liability.term ?? 0;
+    if (term <= 0) {
+        if (rate <= 0) return 0;
+        return Math.round(remaining * rate / PAYMENTS_PER_ROUND * 100) / 100;
+    }
     const monthlyRate = rate / PAYMENTS_PER_ROUND;
-    const payments = term * PAYMENTS_PER_ROUND;
-    const payment = remaining * monthlyRate / (1 - Math.pow(1 + monthlyRate, -payments));
+    const payment = remaining * monthlyRate / (1 - Math.pow(1 + monthlyRate, -term));
     return Math.round(payment * 100) / 100;
 }
 
@@ -128,7 +131,7 @@ async function payInFull(liability: LiabilityModel) {
         <div v-if="liabilities.length === 0" class="text-sm text-gray-500 text-center py-2">
             No liabilities.
         </div>
-        <div v-else class="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 gap-y-1 text-sm">
+        <div v-else class="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-3 gap-y-1 text-sm">
             <template v-for="liability in liabilities" :key="liability.id ?? liability.name">
                 <div class="cursor-pointer font-semibold" @click="toggleRow(liability.id ?? '')">
                     {{ liability.name }}
@@ -142,7 +145,10 @@ async function payInFull(liability: LiabilityModel) {
                 <div class="cursor-pointer text-right" @click="toggleRow(liability.id ?? '')">
                     {{ formatCurrency(liability.expense ?? 0) }}/mo
                 </div>
-                <div v-if="expandedLiabilityId === liability.id" class="col-span-4 bg-slate-200 dark:bg-gray-800 rounded p-2 mb-1">
+                <div class="cursor-pointer text-right text-gray-500" @click="toggleRow(liability.id ?? '')">
+                    {{ (liability.term ?? 0) > 0 ? `${liability.term}mo` : 'Revolving' }}
+                </div>
+                <div v-if="expandedLiabilityId === liability.id" class="col-span-5 bg-slate-200 dark:bg-gray-800 rounded p-2 mb-1">
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs text-gray-500">Max: {{ formatCurrency(maxPayable(liability)) }}</span>
                         <Input v-model.number="payAmount" type="number" min="1"

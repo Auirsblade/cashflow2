@@ -14,7 +14,7 @@ public static class LoanService
             Name = "Personal Loan",
             Amount = amount,
             InterestRate = 0.10m,
-            Term = term
+            Term = term * FinancialConstants.PAYMENTS_PER_ROUND
         };
 
         player.Liabilities.Add(liability);
