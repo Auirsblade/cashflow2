@@ -248,6 +248,18 @@ public class GameService(IMemoryCache gameCache)
         gameCache.Set(game.Code, game);
     }
 
+    public void TakeOutLoan(Game game, Player player, decimal amount, int term)
+    {
+        LoanService.TakeOutLoan(player, amount, term);
+        gameCache.Set(game.Code, game);
+    }
+
+    public void PayOffLoan(Game game, Player player, Guid liabilityId, decimal amount)
+    {
+        LoanService.PayOffLoan(player, liabilityId, amount);
+        gameCache.Set(game.Code, game);
+    }
+
     private void CycleTurn(Game game, Player player)
     {
         int playerIndex = game.Players.IndexOf(player) + 1;

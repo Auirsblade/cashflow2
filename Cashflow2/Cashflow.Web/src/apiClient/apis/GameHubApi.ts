@@ -78,6 +78,13 @@ export interface HubsGameHubMovePlayerPostRequest {
     spacesToMove?: number;
 }
 
+export interface HubsGameHubPayOffLoanPostRequest {
+    gameCode?: string;
+    playerId?: string;
+    liabilityId?: string;
+    amount?: number;
+}
+
 export interface HubsGameHubPlaceBidPostRequest {
     gameCode?: string;
     playerId?: string;
@@ -106,6 +113,13 @@ export interface HubsGameHubSellToMarketPostRequest {
     gameCode?: string;
     playerId?: string;
     assetId?: string;
+}
+
+export interface HubsGameHubTakeOutLoanPostRequest {
+    gameCode?: string;
+    playerId?: string;
+    amount?: number;
+    term?: number;
 }
 
 /**
@@ -439,6 +453,45 @@ export class GameHubApi extends runtime.BaseAPI {
 
     /**
      */
+    async hubsGameHubPayOffLoanPostRaw(requestParameters: HubsGameHubPayOffLoanPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        if (requestParameters['liabilityId'] != null) {
+            queryParameters['liabilityId'] = requestParameters['liabilityId'];
+        }
+
+        if (requestParameters['amount'] != null) {
+            queryParameters['amount'] = requestParameters['amount'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/PayOffLoan`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubPayOffLoanPost(requestParameters: HubsGameHubPayOffLoanPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubPayOffLoanPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async hubsGameHubPlaceBidPostRaw(requestParameters: HubsGameHubPlaceBidPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -610,6 +663,45 @@ export class GameHubApi extends runtime.BaseAPI {
      */
     async hubsGameHubSellToMarketPost(requestParameters: HubsGameHubSellToMarketPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.hubsGameHubSellToMarketPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async hubsGameHubTakeOutLoanPostRaw(requestParameters: HubsGameHubTakeOutLoanPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        if (requestParameters['amount'] != null) {
+            queryParameters['amount'] = requestParameters['amount'];
+        }
+
+        if (requestParameters['term'] != null) {
+            queryParameters['term'] = requestParameters['term'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/TakeOutLoan`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubTakeOutLoanPost(requestParameters: HubsGameHubTakeOutLoanPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubTakeOutLoanPostRaw(requestParameters, initOverrides);
     }
 
 }

@@ -41,6 +41,7 @@ public class Asset
 
 public class Liability
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; }
     public decimal Amount { get; set; }
     public decimal InterestRate { get; set; }

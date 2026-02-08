@@ -5,6 +5,7 @@
     import {formatCurrency} from "../helpers/FormatHelper.ts";
     import {computed} from "vue";
     import StockPortfolio from "@/components/StockPortfolio.vue";
+    import LoanCenter from "@/components/LoanCenter.vue";
 
     const {player, game} = storeToRefs(useGameStateStore())
 
@@ -92,4 +93,5 @@
         </div>
     </div>
     <StockPortfolio v-if="player?.profession" />
+    <LoanCenter v-if="player?.profession" />
 </template>

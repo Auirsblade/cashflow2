@@ -124,6 +124,18 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokeSellStock(game.value?.code, player.value?.id, ticker, quantity);
     }
 
+    const { execute: invokeTakeOutLoan } = useSignalRInvoke(connection, 'TakeOutLoan');
+
+    async function takeOutLoan(amount: number, term: number) {
+        await invokeTakeOutLoan(game.value?.code, player.value?.id, amount, term);
+    }
+
+    const { execute: invokePayOffLoan } = useSignalRInvoke(connection, 'PayOffLoan');
+
+    async function payOffLoan(liabilityId: string, amount: number) {
+        await invokePayOffLoan(game.value?.code, player.value?.id, liabilityId, amount);
+    }
+
     useSignalROn(connection, 'GameStateUpdated', ([gameModel]: [GameModel | undefined]
     ) => {
         if (gameModel) {
@@ -161,6 +173,8 @@ export const useGameStateStore = defineStore('gameState', () => {
         sellToMarket,
         marketPass,
         buyStock,
-        sellStock
+        sellStock,
+        takeOutLoan,
+        payOffLoan
     }
 })

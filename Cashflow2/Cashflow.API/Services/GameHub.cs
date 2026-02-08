@@ -168,6 +168,26 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         await Clients.Group(game.Code).GameStateUpdated(game);
     }
 
+    public async Task TakeOutLoan(string gameCode, Guid playerId, decimal amount, int term)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.TakeOutLoan(game, player, amount, term);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    public async Task PayOffLoan(string gameCode, Guid playerId, Guid liabilityId, decimal amount)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.PayOffLoan(game, player, liabilityId, amount);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
     public async Task MarketPass(string gameCode, Guid playerId)
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;

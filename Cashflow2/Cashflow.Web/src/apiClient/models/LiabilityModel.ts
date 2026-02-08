@@ -24,6 +24,12 @@ export interface LiabilityModel {
      * @type {string}
      * @memberof LiabilityModel
      */
+    id?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LiabilityModel
+     */
     name?: string | null;
     /**
      * 
@@ -68,6 +74,7 @@ export function LiabilityModelFromJSONTyped(json: any, ignoreDiscriminator: bool
     }
     return {
         
+        'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'] == null ? undefined : json['name'],
         'amount': json['amount'] == null ? undefined : json['amount'],
         'interestRate': json['interestRate'] == null ? undefined : json['interestRate'],
@@ -87,6 +94,7 @@ export function LiabilityModelToJSONTyped(value?: Omit<LiabilityModel, 'expense'
 
     return {
         
+        'id': value['id'],
         'name': value['name'],
         'amount': value['amount'],
         'interestRate': value['interestRate'],
