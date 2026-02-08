@@ -148,6 +148,26 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         await Clients.Group(game.Code).GameStateUpdated(game);
     }
 
+    public async Task BuyStock(string gameCode, Guid playerId, string ticker, int quantity)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.BuyStock(game, player, ticker, quantity);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    public async Task SellStock(string gameCode, Guid playerId, string ticker, int quantity)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.SellStock(game, player, ticker, quantity);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
     public async Task MarketPass(string gameCode, Guid playerId)
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;

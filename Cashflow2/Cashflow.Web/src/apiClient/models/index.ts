@@ -17,3 +17,7 @@ export * from './PlayerModel';
 export * from './PlayerOptionsModel';
 export * from './ProfessionModel';
 export * from './PurchaseOfferModel';
+export * from './StockCategoryModel';
+export * from './StockMarketModel';
+export * from './StockPositionModel';
+export * from './StockStateModel';

@@ -13,6 +13,7 @@ public class Game
     public DealAction? DealAction { get; set; }
     public MarketAction? MarketAction { get; set; }
     public CharityAction? CharityAction { get; set; }
+    public StockMarket StockMarket { get; set; } = new();
 
     public Game()
     {

@@ -27,6 +27,13 @@ import {
     ProfessionModelToJSON,
     ProfessionModelToJSONTyped,
 } from './ProfessionModel';
+import type { StockPositionModel } from './StockPositionModel';
+import {
+    StockPositionModelFromJSON,
+    StockPositionModelFromJSONTyped,
+    StockPositionModelToJSON,
+    StockPositionModelToJSONTyped,
+} from './StockPositionModel';
 import type { AssetModel } from './AssetModel';
 import {
     AssetModelFromJSON,
@@ -103,6 +110,18 @@ export interface PlayerModel {
     downsizedTurnsRemaining?: number;
     /**
      * 
+     * @type {Array<StockPositionModel>}
+     * @memberof PlayerModel
+     */
+    stockPositions?: Array<StockPositionModel> | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof PlayerModel
+     */
+    dividendIncome?: number;
+    /**
+     * 
      * @type {number}
      * @memberof PlayerModel
      */
@@ -160,6 +179,8 @@ export function PlayerModelFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'cash': json['cash'] == null ? undefined : json['cash'],
         'charityTurnsRemaining': json['charityTurnsRemaining'] == null ? undefined : json['charityTurnsRemaining'],
         'downsizedTurnsRemaining': json['downsizedTurnsRemaining'] == null ? undefined : json['downsizedTurnsRemaining'],
+        'stockPositions': json['stockPositions'] == null ? undefined : ((json['stockPositions'] as Array<any>).map(StockPositionModelFromJSON)),
+        'dividendIncome': json['dividendIncome'] == null ? undefined : json['dividendIncome'],
         'income': json['income'] == null ? undefined : json['income'],
         'taxes': json['taxes'] == null ? undefined : json['taxes'],
         'childExpenses': json['childExpenses'] == null ? undefined : json['childExpenses'],
@@ -189,6 +210,8 @@ export function PlayerModelToJSONTyped(value?: Omit<PlayerModel, 'income'|'taxes
         'cash': value['cash'],
         'charityTurnsRemaining': value['charityTurnsRemaining'],
         'downsizedTurnsRemaining': value['downsizedTurnsRemaining'],
+        'stockPositions': value['stockPositions'] == null ? undefined : ((value['stockPositions'] as Array<any>).map(StockPositionModelToJSON)),
+        'dividendIncome': value['dividendIncome'],
     };
 }
 

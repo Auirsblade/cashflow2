@@ -40,9 +40,11 @@ export interface HubsGameHubBuyDealPostRequest {
     playerId?: string;
 }
 
-export interface HubsGameHubConfirmAuctionPostRequest {
+export interface HubsGameHubBuyStockPostRequest {
     gameCode?: string;
     playerId?: string;
+    ticker?: string;
+    quantity?: number;
 }
 
 export interface HubsGameHubCreateGamePostRequest {
@@ -91,6 +93,13 @@ export interface HubsGameHubSelectProfessionPostRequest {
 export interface HubsGameHubSellDealPostRequest {
     gameCode?: string;
     playerId?: string;
+}
+
+export interface HubsGameHubSellStockPostRequest {
+    gameCode?: string;
+    playerId?: string;
+    ticker?: string;
+    quantity?: number;
 }
 
 export interface HubsGameHubSellToMarketPostRequest {
@@ -199,7 +208,7 @@ export class GameHubApi extends runtime.BaseAPI {
 
     /**
      */
-    async hubsGameHubConfirmAuctionPostRaw(requestParameters: HubsGameHubConfirmAuctionPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async hubsGameHubBuyStockPostRaw(requestParameters: HubsGameHubBuyStockPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         if (requestParameters['gameCode'] != null) {
@@ -210,10 +219,18 @@ export class GameHubApi extends runtime.BaseAPI {
             queryParameters['playerId'] = requestParameters['playerId'];
         }
 
+        if (requestParameters['ticker'] != null) {
+            queryParameters['ticker'] = requestParameters['ticker'];
+        }
+
+        if (requestParameters['quantity'] != null) {
+            queryParameters['quantity'] = requestParameters['quantity'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/hubs/GameHub/ConfirmAuction`,
+            path: `/hubs/GameHub/BuyStock`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -224,8 +241,8 @@ export class GameHubApi extends runtime.BaseAPI {
 
     /**
      */
-    async hubsGameHubConfirmAuctionPost(requestParameters: HubsGameHubConfirmAuctionPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.hubsGameHubConfirmAuctionPostRaw(requestParameters, initOverrides);
+    async hubsGameHubBuyStockPost(requestParameters: HubsGameHubBuyStockPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubBuyStockPostRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -519,6 +536,45 @@ export class GameHubApi extends runtime.BaseAPI {
      */
     async hubsGameHubSellDealPost(requestParameters: HubsGameHubSellDealPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.hubsGameHubSellDealPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async hubsGameHubSellStockPostRaw(requestParameters: HubsGameHubSellStockPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        if (requestParameters['ticker'] != null) {
+            queryParameters['ticker'] = requestParameters['ticker'];
+        }
+
+        if (requestParameters['quantity'] != null) {
+            queryParameters['quantity'] = requestParameters['quantity'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/SellStock`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubSellStockPost(requestParameters: HubsGameHubSellStockPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubSellStockPostRaw(requestParameters, initOverrides);
     }
 
     /**

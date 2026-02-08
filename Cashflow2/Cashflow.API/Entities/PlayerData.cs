@@ -12,9 +12,11 @@ public class Player(string name)
     public decimal Cash { get; set; } = 0;
     public int CharityTurnsRemaining { get; set; } = 0;
     public int DownsizedTurnsRemaining { get; set; } = 0;
+    public List<StockPosition> StockPositions { get; set; } = new();
+    public decimal DividendIncome { get; set; } = 0;
 
     // Calculated fields
-    public decimal Income => Assets.Sum(x => x.Income) + (Profession?.Salary ?? 0);
+    public decimal Income => Assets.Sum(x => x.Income) + (Profession?.Salary ?? 0) + DividendIncome;
     public decimal Taxes => Income * 0.20M;
     public decimal ChildExpenses => (Profession?.ChildExpense ?? 0) * NumberOfChildren;
     public decimal Expenses => Liabilities.Sum(x => x.Expense) + ChildExpenses + (Profession?.OtherExpenses ?? 0);

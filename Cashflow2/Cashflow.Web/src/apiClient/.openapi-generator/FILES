@@ -19,5 +19,9 @@ models/PlayerModel.ts
 models/PlayerOptionsModel.ts
 models/ProfessionModel.ts
 models/PurchaseOfferModel.ts
+models/StockCategoryModel.ts
+models/StockMarketModel.ts
+models/StockPositionModel.ts
+models/StockStateModel.ts
 models/index.ts
 runtime.ts

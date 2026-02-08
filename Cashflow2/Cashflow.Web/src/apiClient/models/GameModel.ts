@@ -55,6 +55,13 @@ import {
     DealActionModelToJSON,
     DealActionModelToJSONTyped,
 } from './DealActionModel';
+import type { StockMarketModel } from './StockMarketModel';
+import {
+    StockMarketModelFromJSON,
+    StockMarketModelFromJSONTyped,
+    StockMarketModelToJSON,
+    StockMarketModelToJSONTyped,
+} from './StockMarketModel';
 
 /**
  * 
@@ -116,6 +123,12 @@ export interface GameModel {
      * @memberof GameModel
      */
     charityAction?: CharityActionModel;
+    /**
+     * 
+     * @type {StockMarketModel}
+     * @memberof GameModel
+     */
+    stockMarket?: StockMarketModel;
 }
 
 /**
@@ -144,6 +157,7 @@ export function GameModelFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'dealAction': json['dealAction'] == null ? undefined : DealActionModelFromJSON(json['dealAction']),
         'marketAction': json['marketAction'] == null ? undefined : MarketActionModelFromJSON(json['marketAction']),
         'charityAction': json['charityAction'] == null ? undefined : CharityActionModelFromJSON(json['charityAction']),
+        'stockMarket': json['stockMarket'] == null ? undefined : StockMarketModelFromJSON(json['stockMarket']),
     };
 }
 
@@ -167,6 +181,7 @@ export function GameModelToJSONTyped(value?: GameModel | null, ignoreDiscriminat
         'dealAction': DealActionModelToJSON(value['dealAction']),
         'marketAction': MarketActionModelToJSON(value['marketAction']),
         'charityAction': CharityActionModelToJSON(value['charityAction']),
+        'stockMarket': StockMarketModelToJSON(value['stockMarket']),
     };
 }
 

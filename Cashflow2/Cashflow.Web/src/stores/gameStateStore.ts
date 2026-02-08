@@ -112,6 +112,18 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokeMarketPass(game.value?.code, player.value?.id);
     }
 
+    const { execute: invokeBuyStock } = useSignalRInvoke(connection, 'BuyStock');
+
+    async function buyStock(ticker: string, quantity: number) {
+        await invokeBuyStock(game.value?.code, player.value?.id, ticker, quantity);
+    }
+
+    const { execute: invokeSellStock } = useSignalRInvoke(connection, 'SellStock');
+
+    async function sellStock(ticker: string, quantity: number) {
+        await invokeSellStock(game.value?.code, player.value?.id, ticker, quantity);
+    }
+
     useSignalROn(connection, 'GameStateUpdated', ([gameModel]: [GameModel | undefined]
     ) => {
         if (gameModel) {
@@ -147,6 +159,8 @@ export const useGameStateStore = defineStore('gameState', () => {
         placeBid,
         auctionPass,
         sellToMarket,
-        marketPass
+        marketPass,
+        buyStock,
+        sellStock
     }
 })

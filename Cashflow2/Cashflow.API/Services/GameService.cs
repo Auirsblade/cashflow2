@@ -12,6 +12,7 @@ public class GameService(IMemoryCache gameCache)
     public Game CreateGame(Player creator)
     {
         Game game = new();
+        game.StockMarket = StockMarketService.InitializeMarket();
         game.Players.Add(creator);
         game.CurrentPlayerId = creator.Id;
 
@@ -235,6 +236,18 @@ public class GameService(IMemoryCache gameCache)
         return combo;
     }
 
+    public void BuyStock(Game game, Player player, string ticker, int quantity)
+    {
+        StockMarketService.BuyStock(game, player, ticker, quantity);
+        gameCache.Set(game.Code, game);
+    }
+
+    public void SellStock(Game game, Player player, string ticker, int quantity)
+    {
+        StockMarketService.SellStock(game, player, ticker, quantity);
+        gameCache.Set(game.Code, game);
+    }
+
     private void CycleTurn(Game game, Player player)
     {
         int playerIndex = game.Players.IndexOf(player) + 1;
@@ -244,5 +257,9 @@ public class GameService(IMemoryCache gameCache)
         game.DealAction = null;
         game.MarketAction = null;
         game.CharityAction = null;
+
+        StockMarketService.UpdatePrices(game.StockMarket);
+        StockMarketService.RecalculateAllDividends(game);
+        game.StockMarket.TurnNumber++;
     }
 }

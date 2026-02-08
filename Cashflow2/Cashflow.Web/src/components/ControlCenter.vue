@@ -4,6 +4,7 @@
     import {useGameStateStore} from "@/stores/gameStateStore.ts";
     import {formatCurrency} from "../helpers/FormatHelper.ts";
     import {computed} from "vue";
+    import StockPortfolio from "@/components/StockPortfolio.vue";
 
     const {player, game} = storeToRefs(useGameStateStore())
 
@@ -31,6 +32,10 @@
                         <div>{{ formatCurrency(asset.income ?? 0) }}</div>
                     </div>
                 </template>
+                <div v-if="(player.dividendIncome ?? 0) > 0" class="ml-2">Dividends:</div>
+                <div v-if="(player.dividendIncome ?? 0) > 0" class="col-start-2 text-right">
+                    {{ formatCurrency(player.dividendIncome ?? 0) }}
+                </div>
                 <template v-for="i in [...Array(maxLineItems - (player.assets?.length ?? 0))]" :key="i">
                     <div class="h-6 max-sm:hidden"/><div class="h-6 max-sm:hidden"/>
                 </template>
@@ -86,4 +91,5 @@
             </div>
         </div>
     </div>
+    <StockPortfolio v-if="player?.profession" />
 </template>
