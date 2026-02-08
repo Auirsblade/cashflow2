@@ -9,6 +9,8 @@ public class GameService(IMemoryCache gameCache)
 {
     public Game? GetGame(string gameCode) => gameCache.Get<Game>(gameCode.ToUpper());
 
+    public void UpdateGame(Game game) => gameCache.Set(game.Code, game);
+
     public Game CreateGame(Player creator)
     {
         Game game = new();

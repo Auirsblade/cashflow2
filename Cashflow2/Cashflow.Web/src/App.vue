@@ -6,7 +6,7 @@
     import Board from "@/components/board/Board.vue";
     import ControlCenter from "@/components/ControlCenter.vue";
     import Ticker from "@/components/Ticker.vue";
-    import {ref} from "vue";
+    import {computed, ref} from "vue";
     import {
         DropdownMenu,
         DropdownMenuTrigger,
@@ -28,6 +28,21 @@
     const gameCode = ref<string>();
     const selectedProfession = ref<ProfessionModel>();
 
+    const emojiList = [
+        '🚀', '🎮', '🎯', '🎨', '🦊', '🐱', '🐶', '🦄', '🐉', '🌟',
+        '🔥', '🌈', '💎', '🎸', '🍕', '🌮', '🧙', '🤖', '🦅', '🐼',
+        '🐸', '🦁', '🐵', '🐧', '🦋', '🌻', '👾', '🎩', '🍀', '🎲'
+    ]
+
+    const takenEmojis = computed(() => {
+        return new Set(
+            game.value?.players
+                ?.filter(p => p.id !== player.value?.id)
+                .map(p => p.emoji)
+                .filter(Boolean)
+        )
+    })
+
 </script>
 
 <template>
@@ -42,7 +57,7 @@
                         <DropdownMenuItem>{{ 'Join Code: ' + game.code }}</DropdownMenuItem>
                         <DropdownMenuSeparator class="bg-slate-900 dark:bg-blue-300"/>
                         <DropdownMenuLabel>Players</DropdownMenuLabel>
-                        <DropdownMenuItem v-for="player in game.players" :key="player.id">{{ player.name }}</DropdownMenuItem>
+                        <DropdownMenuItem v-for="player in game.players" :key="player.id">{{ player.emoji }} {{ player.name }}</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -69,25 +84,44 @@
                 </Button>
             </div>
         </div>
-        <div v-else-if="player && !player.profession" class="content-center grid grid-cols-1 lg:grid-cols-2 w-full gap-x-2 mt-2">
-            <div class="mx-auto lg:mr-0 my-2 w-48 h-10 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
-                <DropdownMenu>
-                    <DropdownMenuTrigger class="block w-full h-10 mb-0">
-                        {{ selectedProfession?.name ?? 'Select Profession' }}
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        class="w-48 bg-slate-400 text-slate-900 dark:bg-gray-800 dark:text-blue-300 dark:border-emerald-300 border-emerald-900">
-                        <DropdownMenuLabel>Professions</DropdownMenuLabel>
-                        <DropdownMenuSeparator class="bg-emerald-900 dark:bg-emerald-300"/>
-                        <DropdownMenuItem v-for="(profession, i) in playerOptions?.professions" :key="i" @click="selectedProfession = profession" :class="selectedProfession == profession ? 'font-bold' : ''">
-                            {{ profession.name }}
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+        <div v-else-if="player && !player.profession" class="content-center w-full mt-2 max-w-md mx-auto">
+            <div class="text-center mb-4">
+                <div class="text-4xl mb-1">{{ player.emoji || '?' }}</div>
+                <div class="text-sm opacity-75">Your Emoji</div>
             </div>
-            <div>
+            <div class="flex flex-wrap justify-center gap-1 mb-4 px-2">
+                <button
+                    v-for="emoji in emojiList"
+                    :key="emoji"
+                    @click="gameState.setEmoji(emoji)"
+                    :disabled="takenEmojis.has(emoji)"
+                    :class="[
+                        'text-2xl w-10 h-10 rounded-md transition-all',
+                        player.emoji === emoji ? 'ring-2 ring-emerald-500 bg-emerald-100 dark:bg-emerald-900' : '',
+                        takenEmojis.has(emoji) ? 'opacity-25 cursor-not-allowed' : 'hover:bg-slate-300 dark:hover:bg-gray-700 cursor-pointer'
+                    ]"
+                >
+                    {{ emoji }}
+                </button>
+            </div>
+            <div class="flex flex-col items-center gap-2">
+                <div class="w-48 h-10 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger class="block w-full h-10 mb-0">
+                            {{ selectedProfession?.name ?? 'Select Profession' }}
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            class="w-48 bg-slate-400 text-slate-900 dark:bg-gray-800 dark:text-blue-300 dark:border-emerald-300 border-emerald-900">
+                            <DropdownMenuLabel>Professions</DropdownMenuLabel>
+                            <DropdownMenuSeparator class="bg-emerald-900 dark:bg-emerald-300"/>
+                            <DropdownMenuItem v-for="(profession, i) in playerOptions?.professions" :key="i" @click="selectedProfession = profession" :class="selectedProfession == profession ? 'font-bold' : ''">
+                                {{ profession.name }}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
                 <Button @click="gameState.selectProfession(selectedProfession!)" :disabled="!selectedProfession"
-                        class="block mx-auto my-2 h-10 lg:ml-0 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
+                        class="block h-10 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
                     {{ 'Start' }}
                 </Button>
             </div>

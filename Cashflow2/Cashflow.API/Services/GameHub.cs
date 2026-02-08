@@ -11,6 +11,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     public async Task<GameResponse> CreateGame(string playerName)
     {
         Player player = new(playerName);
+        AssignRandomEmoji(player, []);
         Game game = gameService.CreateGame(player);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
@@ -33,6 +34,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         }
 
         Player player = new(playerName);
+        AssignRandomEmoji(player, game.Players);
         gameService.JoinGame(player, game);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
@@ -199,6 +201,23 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         await Clients.Group(game.Code).GameStateUpdated(game);
     }
 
+    public async Task SetEmoji(string gameCode, Guid playerId, string emoji)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        if (game.Players.Any(p => p.Id != playerId && p.Emoji == emoji))
+        {
+            await Clients.Client(Context.ConnectionId).Error("Emoji already taken");
+            return;
+        }
+
+        player.Emoji = emoji;
+        gameService.UpdateGame(game);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
     public async Task MarketPass(string gameCode, Guid playerId)
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;
@@ -239,5 +258,14 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
 
         await Clients.Client(Context.ConnectionId).Error("Asset not found");
         return null;
+    }
+
+    private static void AssignRandomEmoji(Player player, List<Player> existingPlayers)
+    {
+        var taken = existingPlayers.Select(p => p.Emoji).ToHashSet();
+        var available = EmojiList.Available.Where(e => !taken.Contains(e)).ToArray();
+        player.Emoji = available.Length > 0
+            ? available[Random.Shared.Next(available.Length)]
+            : EmojiList.Available[Random.Shared.Next(EmojiList.Available.Length)];
     }
 }

@@ -118,6 +118,12 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokePayDoodad(game.value?.code, player.value?.id, useCard);
     }
 
+    const { execute: invokeSetEmoji } = useSignalRInvoke(connection, 'SetEmoji');
+
+    async function setEmoji(emoji: string) {
+        await invokeSetEmoji(game.value?.code, player.value?.id, emoji);
+    }
+
     const { execute: invokeBuyStock } = useSignalRInvoke(connection, 'BuyStock');
 
     async function buyStock(ticker: string, quantity: number) {
@@ -182,6 +188,7 @@ export const useGameStateStore = defineStore('gameState', () => {
         sellStock,
         takeOutLoan,
         payOffLoan,
-        payDoodad
+        payDoodad,
+        setEmoji
     }
 })

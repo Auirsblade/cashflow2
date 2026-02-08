@@ -122,6 +122,12 @@ export interface PlayerModel {
     dividendIncome?: number;
     /**
      * 
+     * @type {string}
+     * @memberof PlayerModel
+     */
+    emoji?: string | null;
+    /**
+     * 
      * @type {number}
      * @memberof PlayerModel
      */
@@ -181,6 +187,7 @@ export function PlayerModelFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'downsizedTurnsRemaining': json['downsizedTurnsRemaining'] == null ? undefined : json['downsizedTurnsRemaining'],
         'stockPositions': json['stockPositions'] == null ? undefined : ((json['stockPositions'] as Array<any>).map(StockPositionModelFromJSON)),
         'dividendIncome': json['dividendIncome'] == null ? undefined : json['dividendIncome'],
+        'emoji': json['emoji'] == null ? undefined : json['emoji'],
         'income': json['income'] == null ? undefined : json['income'],
         'taxes': json['taxes'] == null ? undefined : json['taxes'],
         'childExpenses': json['childExpenses'] == null ? undefined : json['childExpenses'],
@@ -212,6 +219,7 @@ export function PlayerModelToJSONTyped(value?: Omit<PlayerModel, 'income'|'taxes
         'downsizedTurnsRemaining': value['downsizedTurnsRemaining'],
         'stockPositions': value['stockPositions'] == null ? undefined : ((value['stockPositions'] as Array<any>).map(StockPositionModelToJSON)),
         'dividendIncome': value['dividendIncome'],
+        'emoji': value['emoji'],
     };
 }
 

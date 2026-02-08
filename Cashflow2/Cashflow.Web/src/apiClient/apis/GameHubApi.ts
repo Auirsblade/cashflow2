@@ -78,6 +78,12 @@ export interface HubsGameHubMovePlayerPostRequest {
     spacesToMove?: number;
 }
 
+export interface HubsGameHubPayDoodadPostRequest {
+    gameCode?: string;
+    playerId?: string;
+    useCard?: boolean;
+}
+
 export interface HubsGameHubPayOffLoanPostRequest {
     gameCode?: string;
     playerId?: string;
@@ -113,6 +119,12 @@ export interface HubsGameHubSellToMarketPostRequest {
     gameCode?: string;
     playerId?: string;
     assetId?: string;
+}
+
+export interface HubsGameHubSetEmojiPostRequest {
+    gameCode?: string;
+    playerId?: string;
+    emoji?: string;
 }
 
 export interface HubsGameHubTakeOutLoanPostRequest {
@@ -453,6 +465,41 @@ export class GameHubApi extends runtime.BaseAPI {
 
     /**
      */
+    async hubsGameHubPayDoodadPostRaw(requestParameters: HubsGameHubPayDoodadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        if (requestParameters['useCard'] != null) {
+            queryParameters['useCard'] = requestParameters['useCard'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/PayDoodad`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubPayDoodadPost(requestParameters: HubsGameHubPayDoodadPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubPayDoodadPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async hubsGameHubPayOffLoanPostRaw(requestParameters: HubsGameHubPayOffLoanPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -663,6 +710,41 @@ export class GameHubApi extends runtime.BaseAPI {
      */
     async hubsGameHubSellToMarketPost(requestParameters: HubsGameHubSellToMarketPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.hubsGameHubSellToMarketPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async hubsGameHubSetEmojiPostRaw(requestParameters: HubsGameHubSetEmojiPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        if (requestParameters['emoji'] != null) {
+            queryParameters['emoji'] = requestParameters['emoji'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/SetEmoji`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubSetEmojiPost(requestParameters: HubsGameHubSetEmojiPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubSetEmojiPostRaw(requestParameters, initOverrides);
     }
 
     /**

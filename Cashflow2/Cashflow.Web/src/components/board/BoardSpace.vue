@@ -35,8 +35,8 @@ const spaceStyle = (title: string) => {
     <div :class="'p-2 text-center rounded-md h-full min-h-16 ' + spaceStyle(title).color">
         <Icon :icon="spaceStyle(title).icon" class="md:hidden w-full h-6" />
         <div class="max-md:hidden">{{ title }}</div>
-        <span v-for="player in players" :key="player.id" class="inline-block text-[0.5rem] w-3.5 h-3.5 bg-gray-200 dark:bg-gray-900 rounded-full mx-0.25">
-            {{ player.name![0] }}
+        <span v-for="player in players" :key="player.id" class="inline-block text-xs w-4 h-4 mx-0.25">
+            {{ player.emoji || player.name![0] }}
         </span>
     </div>
 </template>

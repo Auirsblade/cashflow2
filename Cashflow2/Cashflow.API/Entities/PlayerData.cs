@@ -14,6 +14,7 @@ public class Player(string name)
     public int DownsizedTurnsRemaining { get; set; } = 0;
     public List<StockPosition> StockPositions { get; set; } = new();
     public decimal DividendIncome { get; set; } = 0;
+    public string Emoji { get; set; } = "";
 
     // Calculated fields
     public decimal Income => Assets.Sum(x => x.Income) + (Profession?.Salary ?? 0) + DividendIncome;
@@ -74,6 +75,16 @@ public class Player(string name)
         Assets.Remove(asset);
         Cash += purchaseOffer.Price * ((asset.Quantity ?? 0) > 0 ? asset.Quantity : 1) - asset.LoanAmount ?? 0;
     }
+}
+
+public static class EmojiList
+{
+    public static readonly string[] Available =
+    [
+        "🚀", "🎮", "🎯", "🎨", "🦊", "🐱", "🐶", "🦄", "🐉", "🌟",
+        "🔥", "🌈", "💎", "🎸", "🍕", "🌮", "🧙", "🤖", "🦅", "🐼",
+        "🐸", "🦁", "🐵", "🐧", "🦋", "🌻", "👾", "🎩", "🍀", "🎲"
+    ];
 }
 
 public class Profession
