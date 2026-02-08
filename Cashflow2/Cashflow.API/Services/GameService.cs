@@ -126,7 +126,78 @@ public class GameService(IMemoryCache gameCache)
 
     public void SellDeal(Game game, Player player)
     {
-        // Not yet implemented — return gracefully instead of crashing
+        if (game.DealAction?.Asset == null) return;
+        if (game.DealAction.AuctionState != null) return;
+        if (game.Players.Count < 2) return;
+
+        game.DealAction.AuctionState = new AuctionState { SellerId = player.Id };
+        gameCache.Set(game.Code, game);
+    }
+
+    public void PlaceBid(Game game, Player player, decimal bidAmount)
+    {
+        var auction = game.DealAction?.AuctionState;
+        if (auction == null || auction.IsComplete) return;
+        if (player.Id == auction.SellerId) return;
+        if (auction.Bids.ContainsKey(player.Id)) return;
+        if (bidAmount <= 0) return;
+
+        var deal = game.DealAction!.Asset!;
+        if (bidAmount + deal.Equity > player.Cash) return;
+
+        auction.Bids[player.Id] = bidAmount;
+        CheckAuctionComplete(game);
+        gameCache.Set(game.Code, game);
+    }
+
+    public void AuctionPass(Game game, Player player)
+    {
+        var auction = game.DealAction?.AuctionState;
+        if (auction == null || auction.IsComplete) return;
+        if (player.Id == auction.SellerId) return;
+        if (auction.Bids.ContainsKey(player.Id)) return;
+
+        auction.Bids[player.Id] = null;
+        CheckAuctionComplete(game);
+        gameCache.Set(game.Code, game);
+    }
+
+    private void CheckAuctionComplete(Game game)
+    {
+        var auction = game.DealAction!.AuctionState!;
+        int otherPlayerCount = game.Players.Count - 1;
+        if (auction.Bids.Count < otherPlayerCount) return;
+
+        auction.IsComplete = true;
+
+        int sellerIndex = game.Players.FindIndex(p => p.Id == auction.SellerId);
+        decimal highestBid = 0;
+        Guid? winnerId = null;
+
+        for (int i = 1; i < game.Players.Count; i++)
+        {
+            int idx = (sellerIndex + i) % game.Players.Count;
+            var p = game.Players[idx];
+            if (auction.Bids.TryGetValue(p.Id, out var bid) && bid.HasValue && bid.Value > highestBid)
+            {
+                highestBid = bid.Value;
+                winnerId = p.Id;
+            }
+        }
+
+        if (winnerId != null)
+        {
+            var winner = game.Players.First(p => p.Id == winnerId);
+            var seller = game.Players.First(p => p.Id == auction.SellerId);
+            var deal = game.DealAction!.Asset!;
+
+            winner.BuyAsset(deal);
+            winner.Cash -= highestBid;
+            seller.Cash += highestBid;
+
+            auction.WinnerId = winnerId;
+            auction.WinningBid = highestBid;
+        }
     }
 
     public void SellToMarket(Game game, Player player, Asset asset)

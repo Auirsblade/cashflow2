@@ -1,5 +1,6 @@
 ﻿<script setup lang="ts">
     import { Button } from "@/components/ui/button"
+    import { Input } from "@/components/ui/input"
     import DiceRoller from "@/components/board/DiceRoller.vue";
     import { storeToRefs } from "pinia";
     import { useGameStateStore } from "@/stores/gameStateStore.ts";
@@ -63,6 +64,50 @@
     }
 
     const sellDeal = () => gameState.sellDeal();
+
+    const bidAmount = ref<number>(0);
+
+    const isAuctionActive = computed(() => game.value?.dealAction?.auctionState != null);
+    const isSeller = computed(() => game.value?.dealAction?.auctionState?.sellerId === player.value?.id);
+    const isAuctionComplete = computed(() => game.value?.dealAction?.auctionState?.isComplete === true);
+    const hasRespondedToAuction = computed(() => {
+        const auction = game.value?.dealAction?.auctionState;
+        if (!auction || !player.value?.id) return false;
+        const bids = auction.bids as Record<string, number | null> | undefined;
+        return bids != null && player.value.id in bids;
+    });
+    const maxBid = computed(() => {
+        const equity = game.value?.dealAction?.asset?.equity ?? 0;
+        return (player.value?.cash ?? 0) - equity;
+    });
+    const isBidValid = computed(() => bidAmount.value > 0 && bidAmount.value <= maxBid.value);
+
+    const auctionResponseCount = computed(() => {
+        const bids = game.value?.dealAction?.auctionState?.bids as Record<string, number | null> | undefined;
+        return bids ? Object.keys(bids).length : 0;
+    });
+    const auctionTotalBidders = computed(() => (game.value?.players?.length ?? 1) - 1);
+
+    const auctionWinnerName = computed(() => {
+        const winnerId = game.value?.dealAction?.auctionState?.winnerId;
+        if (!winnerId) return null;
+        if (winnerId === player.value?.id) return 'You';
+        return game.value?.players?.find(p => p.id === winnerId)?.name;
+    });
+
+    const bidPlusEquity = computed(() => {
+        const equity = game.value?.dealAction?.asset?.equity ?? 0;
+        return bidAmount.value + equity;
+    });
+
+    const placeBid = () => {
+        if (isBidValid.value) gameState.placeBid(bidAmount.value);
+    };
+    const auctionPass = () => gameState.auctionPass();
+
+    watch(() => game.value?.dealAction?.auctionState, (newVal, oldVal) => {
+        if (oldVal && !newVal) bidAmount.value = 0;
+    });
 
     const completedMarketAction = ref(false);
     const sellToMarket = (asset: AssetModel) => {
@@ -174,11 +219,55 @@
                 <div class="col-span-1 ml-auto">{{ formatCurrency(game!.dealAction.asset.equity ?? 0) }}</div>
                 <div class="col-span-1 ml-auto">Cash Flow:</div>
                 <div class="col-span-1 ml-auto">{{ formatCurrency(game!.dealAction.asset.income ?? 0) }}</div>
-                <Button @click="buyDeal" :disabled="(game!.dealAction.asset?.equity ?? 0) > player!.cash! || !myTurn"
-                        class="col-span-2 md:col-span-4 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Buy Deal
-                </Button>
-                <Button @click="sellDeal" disabled class="min-h-10 col-span-2 bg-green-200 dark:bg-green-800 hover:bg-green-500">Sell Deal</Button>
-                <Button @click="confirmAction" class="min-h-10 col-span-2 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500" :disabled="!myTurn">Pass</Button>
+
+                <!-- No auction active: show buy/sell/pass -->
+                <template v-if="!isAuctionActive">
+                    <Button @click="buyDeal" :disabled="(game!.dealAction.asset?.equity ?? 0) > player!.cash! || !myTurn"
+                            class="col-span-2 md:col-span-4 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Buy Deal
+                    </Button>
+                    <Button @click="sellDeal" :disabled="!myTurn || (game?.players?.length ?? 0) < 2"
+                            class="min-h-10 col-span-2 bg-green-200 dark:bg-green-800 hover:bg-green-500">Sell Deal</Button>
+                    <Button @click="confirmAction" class="min-h-10 col-span-2 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500" :disabled="!myTurn">Pass</Button>
+                </template>
+
+                <!-- Auction active, not complete -->
+                <template v-else-if="!isAuctionComplete">
+                    <div v-if="isSeller" class="col-span-2 md:col-span-4 text-center py-4">
+                        <div class="text-lg font-semibold">Auction In Progress</div>
+                        <div class="text-sm mt-1">{{ auctionResponseCount }} / {{ auctionTotalBidders }} players responded</div>
+                    </div>
+                    <template v-else-if="!hasRespondedToAuction">
+                        <div class="col-span-2 md:col-span-4 text-center text-sm">
+                            Enter your bid (max {{ formatCurrency(maxBid) }}):
+                        </div>
+                        <Input v-model.number="bidAmount" type="number" min="1" :max="maxBid"
+                               placeholder="Bid amount"
+                               class="col-span-2 md:col-span-4" />
+                        <div v-if="bidAmount > 0" class="col-span-2 md:col-span-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                            Total cost: {{ formatCurrency(bidPlusEquity) }} (bid + down payment)
+                        </div>
+                        <Button @click="placeBid" :disabled="!isBidValid"
+                                class="col-span-2 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Place Bid</Button>
+                        <Button @click="auctionPass"
+                                class="col-span-2 min-h-10 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500">Pass</Button>
+                    </template>
+                    <div v-else class="col-span-2 md:col-span-4 text-center py-4">
+                        Waiting for other players...
+                    </div>
+                </template>
+
+                <!-- Auction complete -->
+                <template v-else>
+                    <div class="col-span-2 md:col-span-4 text-center py-2">
+                        <template v-if="auctionWinnerName">
+                            <div class="text-lg font-semibold">{{ auctionWinnerName }} won the auction!</div>
+                            <div class="text-sm">Winning bid: {{ formatCurrency(game!.dealAction.auctionState!.winningBid ?? 0) }}</div>
+                        </template>
+                        <div v-else class="text-lg font-semibold">All players passed</div>
+                    </div>
+                    <Button v-if="isSeller" @click="confirmAction"
+                            class="col-span-2 md:col-span-4 min-h-10 bg-green-200 dark:bg-green-800 hover:bg-green-500">Continue</Button>
+                </template>
             </div>
         </div>
         <div v-else-if="game!.charityAction" class="m-auto">

@@ -94,6 +94,18 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokeSellToMarket(game.value?.code, player.value?.id, asset?.id);
     }
 
+    const { execute: invokePlaceBid } = useSignalRInvoke(connection, 'PlaceBid');
+
+    async function placeBid(bidAmount: number) {
+        await invokePlaceBid(game.value?.code, player.value?.id, bidAmount);
+    }
+
+    const { execute: invokeAuctionPass } = useSignalRInvoke(connection, 'AuctionPass');
+
+    async function auctionPass() {
+        await invokeAuctionPass(game.value?.code, player.value?.id);
+    }
+
     const { execute: invokeMarketPass } = useSignalRInvoke(connection, 'MarketPass');
 
     async function marketPass() {
@@ -132,6 +144,8 @@ export const useGameStateStore = defineStore('gameState', () => {
         getDeal,
         buyDeal,
         sellDeal,
+        placeBid,
+        auctionPass,
         sellToMarket,
         marketPass
     }

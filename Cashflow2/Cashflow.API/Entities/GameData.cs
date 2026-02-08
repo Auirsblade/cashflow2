@@ -66,8 +66,18 @@ public class Doodad
 public class DealAction : GameAction
 {
     public override ActionType Name => ActionType.Deal;
-    public override bool IsAnyPlayer => false;
+    public override bool IsAnyPlayer => AuctionState != null;
     public Asset? Asset { get; set; }
+    public AuctionState? AuctionState { get; set; }
+}
+
+public class AuctionState
+{
+    public Guid SellerId { get; set; }
+    public Dictionary<Guid, decimal?> Bids { get; set; } = new();
+    public Guid? WinnerId { get; set; }
+    public decimal? WinningBid { get; set; }
+    public bool IsComplete { get; set; }
 }
 
 public class MarketAction(PurchaseOffer purchaseOffer) : GameAction

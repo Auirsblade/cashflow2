@@ -117,6 +117,26 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         await Clients.Group(game.Code).GameStateUpdated(game);
     }
 
+    public async Task PlaceBid(string gameCode, Guid playerId, decimal bidAmount)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.PlaceBid(game, player, bidAmount);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    public async Task AuctionPass(string gameCode, Guid playerId)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.AuctionPass(game, player);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
     public async Task SellToMarket(string gameCode, Guid playerId, Guid assetId)
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;

@@ -5,6 +5,7 @@ index.ts
 models/ActionTypeModel.ts
 models/AssetModel.ts
 models/AssetTypeModel.ts
+models/AuctionStateModel.ts
 models/BoardSpaceModel.ts
 models/CharityActionModel.ts
 models/ConfirmActionModel.ts

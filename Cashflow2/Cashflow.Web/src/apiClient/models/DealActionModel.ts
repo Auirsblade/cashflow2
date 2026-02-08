@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { AuctionStateModel } from './AuctionStateModel';
+import {
+    AuctionStateModelFromJSON,
+    AuctionStateModelFromJSONTyped,
+    AuctionStateModelToJSON,
+    AuctionStateModelToJSONTyped,
+} from './AuctionStateModel';
 import type { AssetModel } from './AssetModel';
 import {
     AssetModelFromJSON,
@@ -58,6 +65,12 @@ export interface DealActionModel {
      * @memberof DealActionModel
      */
     asset?: AssetModel;
+    /**
+     * 
+     * @type {AuctionStateModel}
+     * @memberof DealActionModel
+     */
+    auctionState?: AuctionStateModel;
 }
 
 
@@ -83,6 +96,7 @@ export function DealActionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'name': json['name'] == null ? undefined : ActionTypeModelFromJSON(json['name']),
         'isAnyPlayer': json['isAnyPlayer'] == null ? undefined : json['isAnyPlayer'],
         'asset': json['asset'] == null ? undefined : AssetModelFromJSON(json['asset']),
+        'auctionState': json['auctionState'] == null ? undefined : AuctionStateModelFromJSON(json['auctionState']),
     };
 }
 
@@ -99,6 +113,7 @@ export function DealActionModelToJSONTyped(value?: Omit<DealActionModel, 'title'
         
         'name': ActionTypeModelToJSON(value['name']),
         'asset': AssetModelToJSON(value['asset']),
+        'auctionState': AuctionStateModelToJSON(value['auctionState']),
     };
 }
 

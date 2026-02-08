@@ -3,6 +3,7 @@
 export * from './ActionTypeModel';
 export * from './AssetModel';
 export * from './AssetTypeModel';
+export * from './AuctionStateModel';
 export * from './BoardSpaceModel';
 export * from './CharityActionModel';
 export * from './ConfirmActionModel';
