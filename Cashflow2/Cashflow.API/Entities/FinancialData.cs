@@ -56,7 +56,7 @@ public class Liability
                 return Math.Round(Amount * InterestRate / FinancialConstants.PAYMENTS_PER_ROUND, 2);
             if (Term <= 0) return 0;
             if (InterestRate == 0) return Math.Round(Amount / Term, 2);
-            var r = InterestRate / FinancialConstants.PAYMENTS_PER_ROUND;
+            decimal r = InterestRate / FinancialConstants.PAYMENTS_PER_ROUND;
             return Math.Round(Amount * r / (1.0M - (decimal)Math.Pow(1.0 + (double)r, -Term)), 2);
         }
     }
@@ -65,7 +65,7 @@ public class Liability
     {
         if (Term <= 0) return false;
 
-        var monthlyPayment = Expense;
+        decimal monthlyPayment = Expense;
 
         if (InterestRate == 0)
         {
@@ -73,7 +73,7 @@ public class Liability
         }
         else
         {
-            var r = InterestRate / FinancialConstants.PAYMENTS_PER_ROUND;
+            decimal r = InterestRate / FinancialConstants.PAYMENTS_PER_ROUND;
             Amount = Amount * (1 + r) - monthlyPayment;
         }
 

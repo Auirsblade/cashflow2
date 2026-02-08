@@ -5,7 +5,7 @@ using Cashflow.API.Entities;
 using Cashflow.API.Services;
 using Microsoft.OpenApi.Models;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -45,7 +45,7 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSignalRSwaggerGen();
 });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

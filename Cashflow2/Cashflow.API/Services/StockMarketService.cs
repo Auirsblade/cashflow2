@@ -20,9 +20,9 @@ public static class StockMarketService
 
     public static StockMarket InitializeMarket()
     {
-        var market = new StockMarket();
+        StockMarket market = new();
 
-        foreach (var def in Definitions)
+        foreach (StockDefinition def in Definitions)
         {
             market.Stocks.Add(new StockState
             {
@@ -43,13 +43,13 @@ public static class StockMarketService
 
     public static void UpdatePrices(StockMarket market)
     {
-        var rng = new Random();
+        Random rng = new();
 
-        foreach (var stock in market.Stocks)
+        foreach (StockState stock in market.Stocks)
         {
             if (stock.Category == StockCategory.ETF) continue;
 
-            var def = Definitions.First(d => d.Ticker == stock.Ticker);
+            StockDefinition def = Definitions.First(d => d.Ticker == stock.Ticker);
             double mean = stock.Category == StockCategory.BlueChip ? 0.005 : 0.0;
             double change = NextGaussian(rng, mean, def.StdDev);
             change = Math.Clamp(change, -0.90, 9.0);
@@ -63,7 +63,7 @@ public static class StockMarketService
 
     public static void RecalculateETFPrices(StockMarket market)
     {
-        foreach (var etf in market.Stocks.Where(s => s.Category == StockCategory.ETF))
+        foreach (StockState etf in market.Stocks.Where(s => s.Category == StockCategory.ETF))
         {
             if (etf.ComponentTickers == null || etf.ComponentTickers.Count == 0) continue;
 
@@ -79,7 +79,7 @@ public static class StockMarketService
     {
         if (quantity <= 0) return false;
 
-        var stock = game.StockMarket.Stocks.FirstOrDefault(s => s.Ticker == ticker);
+        StockState? stock = game.StockMarket.Stocks.FirstOrDefault(s => s.Ticker == ticker);
         if (stock == null) return false;
 
         decimal totalCost = stock.CurrentPrice * quantity;
@@ -87,7 +87,7 @@ public static class StockMarketService
 
         player.Cash -= totalCost;
 
-        var position = player.StockPositions.FirstOrDefault(p => p.Ticker == ticker);
+        StockPosition? position = player.StockPositions.FirstOrDefault(p => p.Ticker == ticker);
         if (position != null)
         {
             decimal totalExistingCost = position.AverageCost * position.Quantity;
@@ -112,10 +112,10 @@ public static class StockMarketService
     {
         if (quantity <= 0) return false;
 
-        var position = player.StockPositions.FirstOrDefault(p => p.Ticker == ticker);
+        StockPosition? position = player.StockPositions.FirstOrDefault(p => p.Ticker == ticker);
         if (position == null || position.Quantity < quantity) return false;
 
-        var stock = game.StockMarket.Stocks.FirstOrDefault(s => s.Ticker == ticker);
+        StockState? stock = game.StockMarket.Stocks.FirstOrDefault(s => s.Ticker == ticker);
         if (stock == null) return false;
 
         decimal proceeds = stock.CurrentPrice * quantity;
@@ -135,9 +135,9 @@ public static class StockMarketService
     {
         decimal totalDividendIncome = 0;
 
-        foreach (var position in player.StockPositions)
+        foreach (StockPosition position in player.StockPositions)
         {
-            var stock = market.Stocks.FirstOrDefault(s => s.Ticker == position.Ticker);
+            StockState? stock = market.Stocks.FirstOrDefault(s => s.Ticker == position.Ticker);
             if (stock == null || stock.DividendYield == 0) continue;
 
             totalDividendIncome += position.Quantity * stock.CurrentPrice * stock.DividendYield / 12;
@@ -148,7 +148,7 @@ public static class StockMarketService
 
     public static void RecalculateAllDividends(Game game)
     {
-        foreach (var player in game.Players)
+        foreach (Player player in game.Players)
         {
             RecalculatePlayerDividends(player, game.StockMarket);
         }

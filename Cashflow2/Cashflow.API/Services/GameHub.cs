@@ -263,7 +263,7 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
     private static void AssignRandomEmoji(Player player, List<Player> existingPlayers)
     {
         var taken = existingPlayers.Select(p => p.Emoji).ToHashSet();
-        var available = EmojiList.Available.Where(e => !taken.Contains(e)).ToArray();
+        string[] available = EmojiList.Available.Where(e => !taken.Contains(e)).ToArray();
         player.Emoji = available.Length > 0
             ? available[Random.Shared.Next(available.Length)]
             : EmojiList.Available[Random.Shared.Next(EmojiList.Available.Length)];

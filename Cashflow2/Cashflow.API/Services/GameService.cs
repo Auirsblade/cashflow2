@@ -138,13 +138,13 @@ public class GameService(IMemoryCache gameCache)
 
     public void PlaceBid(Game game, Player player, decimal bidAmount)
     {
-        var auction = game.DealAction?.AuctionState;
+        AuctionState? auction = game.DealAction?.AuctionState;
         if (auction == null || auction.IsComplete) return;
         if (player.Id == auction.SellerId) return;
         if (auction.Bids.ContainsKey(player.Id)) return;
         if (bidAmount <= 0) return;
 
-        var deal = game.DealAction!.Asset!;
+        Asset deal = game.DealAction!.Asset!;
         if (bidAmount + deal.Equity > player.Cash) return;
 
         auction.Bids[player.Id] = bidAmount;
@@ -154,7 +154,7 @@ public class GameService(IMemoryCache gameCache)
 
     public void AuctionPass(Game game, Player player)
     {
-        var auction = game.DealAction?.AuctionState;
+        AuctionState? auction = game.DealAction?.AuctionState;
         if (auction == null || auction.IsComplete) return;
         if (player.Id == auction.SellerId) return;
         if (auction.Bids.ContainsKey(player.Id)) return;
@@ -166,7 +166,7 @@ public class GameService(IMemoryCache gameCache)
 
     private void CheckAuctionComplete(Game game)
     {
-        var auction = game.DealAction!.AuctionState!;
+        AuctionState auction = game.DealAction!.AuctionState!;
         int otherPlayerCount = game.Players.Count - 1;
         if (auction.Bids.Count < otherPlayerCount) return;
 
@@ -179,8 +179,8 @@ public class GameService(IMemoryCache gameCache)
         for (int i = 1; i < game.Players.Count; i++)
         {
             int idx = (sellerIndex + i) % game.Players.Count;
-            var p = game.Players[idx];
-            if (auction.Bids.TryGetValue(p.Id, out var bid) && bid.HasValue && bid.Value > highestBid)
+            Player p = game.Players[idx];
+            if (auction.Bids.TryGetValue(p.Id, out decimal? bid) && bid.HasValue && bid.Value > highestBid)
             {
                 highestBid = bid.Value;
                 winnerId = p.Id;
@@ -189,9 +189,9 @@ public class GameService(IMemoryCache gameCache)
 
         if (winnerId != null)
         {
-            var winner = game.Players.First(p => p.Id == winnerId);
-            var seller = game.Players.First(p => p.Id == auction.SellerId);
-            var deal = game.DealAction!.Asset!;
+            Player winner = game.Players.First(p => p.Id == winnerId);
+            Player seller = game.Players.First(p => p.Id == auction.SellerId);
+            Asset deal = game.DealAction!.Asset!;
 
             winner.BuyAsset(deal);
             winner.Cash -= highestBid;
@@ -229,12 +229,12 @@ public class GameService(IMemoryCache gameCache)
 
     public void PayDoodad(Game game, Player player, bool useCard)
     {
-        var doodad = game.ConfirmAction?.Doodad;
+        Doodad? doodad = game.ConfirmAction?.Doodad;
         if (doodad == null) return;
 
         if (useCard)
         {
-            var card = player.Liabilities.FirstOrDefault(l => l.Term <= 0);
+            Liability? card = player.Liabilities.FirstOrDefault(l => l.Term <= 0);
             if (card != null)
             {
                 card.Amount += doodad.Cost;

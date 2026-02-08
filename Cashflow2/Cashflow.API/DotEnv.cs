@@ -7,9 +7,9 @@ public static class DotEnv
         if (!File.Exists(filePath))
             return;
 
-        foreach (var line in File.ReadAllLines(filePath))
+        foreach (string line in File.ReadAllLines(filePath))
         {
-            var parts = line.Split(
+            string[] parts = line.Split(
                 '=',
                 StringSplitOptions.RemoveEmptyEntries);
 

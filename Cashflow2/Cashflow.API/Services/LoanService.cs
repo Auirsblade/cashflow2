@@ -9,7 +9,7 @@ public static class LoanService
         if (amount <= 0) return false;
         if (term < 1 || term > 5) return false;
 
-        var liability = new Liability
+        Liability liability = new()
         {
             Name = "Personal Loan",
             Amount = amount,
@@ -27,7 +27,7 @@ public static class LoanService
     {
         if (amount <= 0) return false;
 
-        var liability = player.Liabilities.FirstOrDefault(l => l.Id == liabilityId);
+        Liability? liability = player.Liabilities.FirstOrDefault(l => l.Id == liabilityId);
         if (liability == null) return false;
 
         amount = Math.Min(amount, liability.Amount);
