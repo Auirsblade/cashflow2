@@ -50,7 +50,8 @@ public static class StockMarketService
             if (stock.Category == StockCategory.ETF) continue;
 
             var def = Definitions.First(d => d.Ticker == stock.Ticker);
-            double change = NextGaussian(rng, 0.005, def.StdDev);
+            double mean = stock.Category == StockCategory.BlueChip ? 0.005 : 0.0;
+            double change = NextGaussian(rng, mean, def.StdDev);
             change = Math.Clamp(change, -0.90, 9.0);
 
             stock.PreviousPrice = stock.CurrentPrice;
