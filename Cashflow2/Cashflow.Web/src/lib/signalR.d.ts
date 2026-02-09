@@ -16,6 +16,14 @@
         execute: (...args: any[]) => void;
     }
 
+    export const HubConnectionState: {
+        Disconnected: string;
+        Connecting: string;
+        Connected: string;
+        Disconnecting: string;
+        Reconnecting: string;
+    };
+
     export function useSignalR(url: string): SignalRConnection;
 
     export function useSignalRInvoke(

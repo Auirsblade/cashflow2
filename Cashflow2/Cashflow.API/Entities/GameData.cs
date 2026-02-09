@@ -7,6 +7,7 @@ public class Game
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Code { get; set; } = Utility.RandomAlphanumericString(4);
     public Guid CurrentPlayerId { get; set; }
+    public Guid CreatorId { get; set; }
     public List<Player> Players { get; set; } = [];
     public List<BoardSpace>? BoardSpaces { get; set; }
     public ConfirmAction? ConfirmAction { get; set; }

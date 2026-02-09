@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type { AssetModel, GameModel, GameResponseModel, PlayerModel, PlayerOptionsModel, ProfessionModel } from "@/apiClient";
-import { useSignalR, useSignalRInvoke, useSignalROn } from "@/lib/signalR";
+import { useSignalR, useSignalRInvoke, useSignalROn, HubConnectionState } from "@/lib/signalR";
 
 export const useGameStateStore = defineStore('gameState', () => {
     const game = ref<GameModel>();
@@ -19,6 +19,7 @@ export const useGameStateStore = defineStore('gameState', () => {
             player.value = gameResponse.player;
             playerOptions.value = gameResponse.playerOptions;
             myTurn.value = gameResponse.game.currentPlayerId == player.value?.id;
+            localStorage.setItem('cf2_session', JSON.stringify({ gameCode: gameResponse.game.code, playerName: gameResponse.player.name }));
         } else {
             console.log("Game failed to start");
             console.log(gameResponse.message);
@@ -36,9 +37,11 @@ export const useGameStateStore = defineStore('gameState', () => {
             player.value = gameResponse.player;
             playerOptions.value = gameResponse.playerOptions;
             myTurn.value = gameResponse.game.currentPlayerId == player.value?.id;
+            localStorage.setItem('cf2_session', JSON.stringify({ gameCode: gameResponse.game.code, playerName: gameResponse.player.name }));
         } else {
             console.log("Failed to join game");
             console.log(gameResponse.message);
+            localStorage.removeItem('cf2_session');
         }
     });
 
@@ -124,6 +127,23 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokeSetEmoji(game.value?.code, player.value?.id, emoji);
     }
 
+    const { execute: invokeRemovePlayer } = useSignalRInvoke(connection, 'RemovePlayer');
+
+    async function removePlayer(targetPlayerId: string) {
+        await invokeRemovePlayer(game.value?.code, player.value?.id, targetPlayerId);
+    }
+
+    const { execute: invokeLeaveGame } = useSignalRInvoke(connection, 'LeaveGame');
+
+    async function leaveGame() {
+        await invokeLeaveGame(game.value?.code, player.value?.id);
+        game.value = undefined;
+        player.value = undefined;
+        playerOptions.value = undefined;
+        myTurn.value = false;
+        localStorage.removeItem('cf2_session');
+    }
+
     const { execute: invokeBuyStock } = useSignalRInvoke(connection, 'BuyStock');
 
     async function buyStock(ticker: string, quantity: number) {
@@ -148,15 +168,48 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokePayOffLoan(game.value?.code, player.value?.id, liabilityId, amount);
     }
 
+    async function autoRejoin() {
+        const session = localStorage.getItem('cf2_session');
+        if (!session) return;
+
+        // Wait for SignalR connection to be ready
+        if (status.value !== HubConnectionState.Connected) {
+            await new Promise<void>((resolve) => {
+                const unwatch = watch(status, (newStatus) => {
+                    if (newStatus === HubConnectionState.Connected) {
+                        unwatch();
+                        resolve();
+                    }
+                }, { immediate: true });
+            });
+        }
+
+        try {
+            const { gameCode, playerName } = JSON.parse(session);
+            if (gameCode && playerName) {
+                await joinGame(playerName, gameCode);
+            }
+        } catch {
+            localStorage.removeItem('cf2_session');
+        }
+    }
+
     useSignalROn(connection, 'GameStateUpdated', ([gameModel]: [GameModel | undefined]
     ) => {
-        if (gameModel) {
-            game.value = gameModel;
-            player.value = gameModel.players?.find(x => x.id == player.value?.id)
-            myTurn.value = game.value.currentPlayerId == player.value?.id;
-        } else {
-            console.log("No game state received");
+        if (!gameModel || !player.value?.id) return;
+
+        const updatedPlayer = gameModel.players?.find(x => x.id == player.value?.id);
+        if (!updatedPlayer || updatedPlayer.isActive === false) {
+            game.value = undefined;
+            player.value = undefined;
+            playerOptions.value = undefined;
+            myTurn.value = false;
+            localStorage.removeItem('cf2_session');
+            return;
         }
+        game.value = gameModel;
+        player.value = updatedPlayer;
+        myTurn.value = game.value.currentPlayerId == player.value?.id;
     });
 
     useSignalROn(connection, 'Error', ([message]: [string]) => {
@@ -189,6 +242,9 @@ export const useGameStateStore = defineStore('gameState', () => {
         takeOutLoan,
         payOffLoan,
         payDoodad,
-        setEmoji
+        setEmoji,
+        removePlayer,
+        leaveGame,
+        autoRejoin
     }
 })

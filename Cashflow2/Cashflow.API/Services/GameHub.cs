@@ -28,8 +28,10 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         
         if (existingPlayer != null)
         {
-            // Player already exists, return existing player instead of creating new one
+            existingPlayer.IsActive = true;
+            gameService.UpdateGame(game);
             await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
+            await Clients.OthersInGroup(game.Code).GameStateUpdated(game);
             return new GameResponse { Player = existingPlayer, Game = game, PlayerOptions = new PlayerOptions() };
         }
 
@@ -214,6 +216,36 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
 
         player.Emoji = emoji;
         gameService.UpdateGame(game);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    public async Task RemovePlayer(string gameCode, Guid adminId, Guid targetPlayerId)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (game.CreatorId != adminId)
+        {
+            await Clients.Client(Context.ConnectionId).Error("Only the game creator can remove players");
+            return;
+        }
+        if (await ValidatePlayerExistence(game, targetPlayerId) is not { } targetPlayer) return;
+        if (targetPlayer.Id == adminId)
+        {
+            await Clients.Client(Context.ConnectionId).Error("Cannot remove yourself");
+            return;
+        }
+
+        gameService.RemovePlayer(game, targetPlayer);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
+    public async Task LeaveGame(string gameCode, Guid playerId)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+
+        gameService.RemovePlayer(game, player);
 
         await Clients.Group(game.Code).GameStateUpdated(game);
     }

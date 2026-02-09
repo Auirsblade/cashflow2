@@ -6,7 +6,7 @@
     import Board from "@/components/board/Board.vue";
     import ControlCenter from "@/components/ControlCenter.vue";
     import Ticker from "@/components/Ticker.vue";
-    import {computed, ref} from "vue";
+    import {computed, onMounted, ref} from "vue";
     import {
         DropdownMenu,
         DropdownMenuTrigger,
@@ -43,6 +43,12 @@
         )
     })
 
+    const isAdmin = computed(() => game.value?.creatorId === player.value?.id);
+
+    onMounted(() => {
+        gameState.autoRejoin();
+    });
+
 </script>
 
 <template>
@@ -57,7 +63,18 @@
                         <DropdownMenuItem>{{ 'Join Code: ' + game.code }}</DropdownMenuItem>
                         <DropdownMenuSeparator class="bg-slate-900 dark:bg-blue-300"/>
                         <DropdownMenuLabel>Players</DropdownMenuLabel>
-                        <DropdownMenuItem v-for="player in game.players" :key="player.id">{{ player.emoji }} {{ player.name }}</DropdownMenuItem>
+                        <DropdownMenuItem v-for="p in game.players" :key="p.id ?? p.name ?? ''" class="flex items-center justify-between">
+                            <span :class="p.isActive === false ? 'opacity-50' : ''">
+                                {{ p.emoji }} {{ p.name }}{{ p.isActive === false ? ' (left)' : '' }}
+                            </span>
+                            <button v-if="isAdmin && p.id !== player?.id && p.isActive !== false"
+                                    @click.stop="gameState.removePlayer(p.id!)"
+                                    class="ml-2 text-red-500 hover:text-red-700 text-xs">&#10005;</button>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator class="bg-slate-900 dark:bg-blue-300"/>
+                        <DropdownMenuItem @click="gameState.leaveGame()" class="text-red-500 hover:text-red-700 cursor-pointer">
+                            Leave Game
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -74,13 +91,10 @@
                 <Input v-model="gameCode" placeholder="game code" class="mx-auto lg:mr-0 my-2 w-48"></Input>
             </div>
             <div>
-                <Button @click="gameState.createGame(playerName!)" :disabled="!playerName"
+                <Button @click="gameCode ? gameState.joinGame(playerName!, gameCode!) : gameState.createGame(playerName!)"
+                        :disabled="!playerName || (!!gameCode && gameCode.trim() === '')"
                         class="block mx-auto my-2 h-10 lg:ml-0 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
-                    {{ 'Start Game' }}
-                </Button>
-                <Button @click="gameState.joinGame(playerName!, gameCode!)" :disabled="!playerName || !gameCode"
-                        class="block mx-auto my-2 h-10 lg:ml-0 w-48 border-2 dark:border-emerald-300 border-emerald-900 rounded-md shadow drop-shadow-md shadow-gray-600">
-                    {{ 'Join Game' }}
+                    {{ gameCode ? 'Join Game' : 'Start Game' }}
                 </Button>
             </div>
         </div>
@@ -111,7 +125,7 @@
                             {{ selectedProfession?.name ?? 'Select Profession' }}
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
-                            class="w-48 bg-slate-400 text-slate-900 dark:bg-gray-800 dark:text-blue-300 dark:border-emerald-300 border-emerald-900">
+                            class="w-48 max-h-60 overflow-y-auto bg-slate-400 text-slate-900 dark:bg-gray-800 dark:text-blue-300 dark:border-emerald-300 border-emerald-900">
                             <DropdownMenuLabel>Professions</DropdownMenuLabel>
                             <DropdownMenuSeparator class="bg-emerald-900 dark:bg-emerald-300"/>
                             <DropdownMenuItem v-for="(profession, i) in playerOptions?.professions" :key="i" @click="selectedProfession = profession" :class="selectedProfession == profession ? 'font-bold' : ''">

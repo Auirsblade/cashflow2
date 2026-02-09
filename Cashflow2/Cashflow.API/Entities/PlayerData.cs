@@ -15,6 +15,7 @@ public class Player(string name)
     public List<StockPosition> StockPositions { get; set; } = new();
     public decimal DividendIncome { get; set; } = 0;
     public string Emoji { get; set; } = "";
+    public bool IsActive { get; set; } = true;
 
     // Calculated fields
     public decimal Income => Assets.Sum(x => x.Income) + (Profession?.Salary ?? 0) + DividendIncome;
@@ -60,7 +61,7 @@ public class Player(string name)
 
     public void BuyCharity()
     {
-        CharityTurnsRemaining = 2;
+        CharityTurnsRemaining = 3;
         Cash -= Income * 0.10M;
     }
 

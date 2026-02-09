@@ -11,8 +11,8 @@ const gameState = useGameStateStore();
 const { player } = storeToRefs(gameState);
 
 const expandedLiabilityId = ref<string | null>(null);
-const payAmount = ref<number>(0);
-const loanAmount = ref<number>(1000);
+const payAmount = ref<number | undefined>(undefined);
+const loanAmount = ref<number | undefined>(undefined);
 const loanTerm = ref<number>(3);
 const showLoanForm = ref(false);
 
@@ -21,7 +21,7 @@ const PAYMENTS_PER_ROUND = 12;
 const liabilities = computed(() => player.value?.liabilities ?? []);
 
 const previewMonthlyPayment = computed(() => {
-    const principal = loanAmount.value;
+    const principal = loanAmount.value ?? 0;
     const rate = 0.10;
     if (principal <= 0 || loanTerm.value < 1) return 0;
     const monthlyRate = rate / PAYMENTS_PER_ROUND;
@@ -31,7 +31,7 @@ const previewMonthlyPayment = computed(() => {
 });
 
 function payoffPreviewPayment(liability: LiabilityModel): number {
-    const amount = Math.min(payAmount.value, liability.amount ?? 0);
+    const amount = Math.min(payAmount.value ?? 0, liability.amount ?? 0);
     const remaining = (liability.amount ?? 0) - amount;
     if (remaining <= 0) return 0;
     const rate = liability.interestRate ?? 0;
@@ -50,7 +50,7 @@ function toggleRow(id: string) {
         expandedLiabilityId.value = null;
     } else {
         expandedLiabilityId.value = id;
-        payAmount.value = 0;
+        payAmount.value = undefined;
     }
 }
 
@@ -59,10 +59,10 @@ function maxPayable(liability: LiabilityModel): number {
 }
 
 async function takeOutLoan() {
-    if (loanAmount.value <= 0 || loanTerm.value < 1 || loanTerm.value > 5) return;
+    if (!loanAmount.value || loanAmount.value <= 0 || loanTerm.value < 1 || loanTerm.value > 5) return;
     await gameState.takeOutLoan(loanAmount.value, loanTerm.value);
     showLoanForm.value = false;
-    loanAmount.value = 1000;
+    loanAmount.value = undefined;
     loanTerm.value = 3;
 }
 
@@ -103,7 +103,7 @@ async function payInFull(liability: LiabilityModel) {
                 <div class="flex items-center gap-2 flex-wrap">
                     <div class="flex items-center gap-1">
                         <span class="text-xs text-gray-500">$</span>
-                        <Input v-model.number="loanAmount" type="number" min="1" class="w-24 text-sm" />
+                        <Input v-model.number="loanAmount" type="number" min="1" placeholder="Amount" class="w-24 text-sm" />
                     </div>
                     <div class="flex items-center gap-1">
                         <select v-model.number="loanTerm"
@@ -117,7 +117,7 @@ async function payInFull(liability: LiabilityModel) {
                     </div>
                     <span class="text-xs text-gray-500">{{ formatCurrency(previewMonthlyPayment) }}/mo</span>
                     <Button @click="takeOutLoan()"
-                            :disabled="loanAmount <= 0 || loanTerm < 1 || loanTerm > 5"
+                            :disabled="!loanAmount || loanAmount <= 0 || loanTerm < 1 || loanTerm > 5"
                             class="text-xs px-3 py-1 bg-green-600 hover:bg-green-700 text-white">
                         Borrow
                     </Button>
@@ -153,18 +153,18 @@ async function payInFull(liability: LiabilityModel) {
                         <span class="text-xs text-gray-500">Max: {{ formatCurrency(maxPayable(liability)) }}</span>
                         <Input v-model.number="payAmount" type="number" min="1"
                                :max="maxPayable(liability)"
-                               class="w-24 text-sm" />
-                        <Button @click="payLoan(liability.id!, payAmount)"
-                                :disabled="payAmount <= 0 || payAmount > maxPayable(liability)"
+                               placeholder="Amount" class="w-24 text-sm" />
+                        <Button @click="payLoan(liability.id!, payAmount ?? 0)"
+                                :disabled="!payAmount || payAmount <= 0 || payAmount > maxPayable(liability)"
                                 class="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white">
-                            Pay {{ formatCurrency(payAmount) }}
+                            Pay {{ formatCurrency(payAmount ?? 0) }}
                         </Button>
                         <Button @click="payInFull(liability)"
                                 :disabled="(player?.cash ?? 0) < (liability.amount ?? 0)"
                                 class="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white">
                             Pay in Full
                         </Button>
-                        <span v-if="payAmount > 0 && payAmount <= maxPayable(liability)" class="text-xs text-gray-500">
+                        <span v-if="(payAmount ?? 0) > 0 && (payAmount ?? 0) <= maxPayable(liability)" class="text-xs text-gray-500">
                             New payment: {{ formatCurrency(payoffPreviewPayment(liability)) }}/mo
                         </span>
                     </div>

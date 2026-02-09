@@ -4,7 +4,7 @@
     import DiceRoller from "@/components/board/DiceRoller.vue";
     import { storeToRefs } from "pinia";
     import { useGameStateStore } from "@/stores/gameStateStore.ts";
-    import { computed, onMounted, ref, watch } from "vue";
+    import { computed, onMounted, onUnmounted, ref, watch } from "vue";
     import { formatCurrency } from "@/helpers/FormatHelper.ts";
     import type { AssetModel } from "@/apiClient";
     import {
@@ -137,6 +137,140 @@
         if (game.value?.marketAction?.purchaseOffer) return player.value?.assets?.filter(x => x.type == game.value!.marketAction?.purchaseOffer?.type)
     })
 
+    // Player checklist for auctions
+    const auctionChecklist = computed(() => {
+        const auction = game.value?.dealAction?.auctionState;
+        if (!auction) return [];
+        const bids = auction.bids as Record<string, number | null> | undefined;
+        return (game.value?.players ?? [])
+            .filter(p => p.id !== auction.sellerId)
+            .map(p => ({
+                emoji: p.emoji ?? '',
+                name: p.name ?? '',
+                responded: bids != null && (p.id ?? '') in bids
+            }));
+    });
+
+    // Player checklist for market actions
+    const marketChecklist = computed(() => {
+        const market = game.value?.marketAction;
+        if (!market) return [];
+        const responded = market.playersResponded as string[] | undefined;
+        const respondedSet = new Set(responded ?? []);
+        return (game.value?.players ?? []).map(p => ({
+            emoji: p.emoji ?? '',
+            name: p.name ?? '',
+            responded: respondedSet.has(p.id ?? '')
+        }));
+    });
+
+    // Downsized auto-accept timer (5s)
+    const downsizedCountdown = ref(0);
+    let downsizedTimer: ReturnType<typeof setInterval> | null = null;
+
+    const isDownsizedVisible = computed(() =>
+        myTurn.value && (
+            game.value?.confirmAction?.title === 'Downsized' ||
+            (!game.value?.confirmAction && !game.value?.dealAction &&
+             !game.value?.marketAction && !game.value?.charityAction &&
+             (player.value?.downsizedTurnsRemaining ?? 0) > 0)
+        )
+    );
+
+    function startDownsizedTimer() {
+        if (downsizedTimer) return;
+        downsizedCountdown.value = 5;
+        downsizedTimer = setInterval(() => {
+            downsizedCountdown.value--;
+            if (downsizedCountdown.value <= 0) {
+                stopDownsizedTimer();
+                gameState.endTurn();
+                rolled.value = 0;
+            }
+        }, 1000);
+    }
+
+    function stopDownsizedTimer() {
+        if (downsizedTimer) { clearInterval(downsizedTimer); downsizedTimer = null; }
+        downsizedCountdown.value = 0;
+    }
+
+    watch(isDownsizedVisible, (visible) => {
+        if (visible) startDownsizedTimer();
+        else stopDownsizedTimer();
+    }, { immediate: true });
+
+    // Auction timer (30s)
+    const auctionCountdown = ref(0);
+    let auctionTimer: ReturnType<typeof setInterval> | null = null;
+
+    function startAuctionTimer() {
+        stopAuctionTimer();
+        auctionCountdown.value = 30;
+        auctionTimer = setInterval(() => {
+            auctionCountdown.value--;
+            if (auctionCountdown.value <= 0) {
+                stopAuctionTimer();
+                // Auto-pass if we haven't responded yet
+                if (!hasRespondedToAuction.value && !isSeller.value) {
+                    auctionPass();
+                }
+            }
+        }, 1000);
+    }
+
+    function stopAuctionTimer() {
+        if (auctionTimer) { clearInterval(auctionTimer); auctionTimer = null; }
+        auctionCountdown.value = 0;
+    }
+
+    watch(isAuctionActive, (active) => {
+        if (active && !isAuctionComplete.value) startAuctionTimer();
+        else stopAuctionTimer();
+    }, { immediate: true });
+
+    watch(isAuctionComplete, (complete) => {
+        if (complete) stopAuctionTimer();
+    });
+
+    // Market auto-pass timer (5s) for turn player without assets
+    const marketAutoPassCountdown = ref(0);
+    let marketAutoPassTimer: ReturnType<typeof setInterval> | null = null;
+
+    const turnPlayerNoMarketAssets = computed(() =>
+        myTurn.value && game.value?.marketAction != null &&
+        !completedMarketAction.value &&
+        (assetsOfType.value?.length ?? 0) === 0
+    );
+
+    function startMarketAutoPassTimer() {
+        stopMarketAutoPassTimer();
+        marketAutoPassCountdown.value = 5;
+        marketAutoPassTimer = setInterval(() => {
+            marketAutoPassCountdown.value--;
+            if (marketAutoPassCountdown.value <= 0) {
+                stopMarketAutoPassTimer();
+                marketPass();
+            }
+        }, 1000);
+    }
+
+    function stopMarketAutoPassTimer() {
+        if (marketAutoPassTimer) { clearInterval(marketAutoPassTimer); marketAutoPassTimer = null; }
+        marketAutoPassCountdown.value = 0;
+    }
+
+    watch(turnPlayerNoMarketAssets, (val) => {
+        if (val) startMarketAutoPassTimer();
+        else stopMarketAutoPassTimer();
+    }, { immediate: true });
+
+    onUnmounted(() => {
+        stopDownsizedTimer();
+        stopAuctionTimer();
+        stopMarketAutoPassTimer();
+    });
+
 </script>
 
 <template>
@@ -199,7 +333,7 @@
                 <div class="grid grid-cols-1 m-2 p-2 gap-2 rounded-md bg-slate-300 dark:bg-gray-800 shadow-md">
                     {{ playerName }} got downsized, and lost: {{ formatCurrency(player!.expenses ?? 0) }}
                     <Button @click="confirmAction" class="min-h-24 bg-red-200 dark:bg-red-800 hover:bg-red-200/70 hover:dark:bg-red-800/80" :disabled="!myTurn">
-                        Unfortunate...
+                        {{ myTurn && downsizedCountdown > 0 ? `Unfortunate... (${downsizedCountdown}s)` : 'Unfortunate...' }}
                     </Button>
                 </div>
             </div>
@@ -246,24 +380,46 @@
                     <div v-if="isSeller" class="col-span-2 md:col-span-4 text-center py-4">
                         <div class="text-lg font-semibold">Auction In Progress</div>
                         <div class="text-sm mt-1">{{ auctionResponseCount }} / {{ auctionTotalBidders }} players responded</div>
+                        <div v-if="auctionCountdown > 0" class="text-sm mt-1 text-orange-600 dark:text-orange-400">Time remaining: {{ auctionCountdown }}s</div>
+                        <div class="mt-2 text-sm space-y-1">
+                            <div v-for="p in auctionChecklist" :key="p.name" class="flex items-center justify-center gap-1">
+                                <span>{{ p.emoji }} {{ p.name }}</span>
+                                <span v-if="p.responded" class="text-green-600">&#10003;</span>
+                                <span v-else class="text-gray-400">&#8987;</span>
+                            </div>
+                        </div>
                     </div>
                     <template v-else-if="!hasRespondedToAuction">
-                        <div class="col-span-2 md:col-span-4 text-center text-sm">
-                            Enter your bid (max {{ formatCurrency(maxBid) }}):
+                        <template v-if="maxBid > 0">
+                            <div class="col-span-2 md:col-span-4 text-center text-sm">
+                                Enter your bid (max {{ formatCurrency(maxBid) }}){{ auctionCountdown > 0 ? ` — ${auctionCountdown}s` : '' }}:
+                            </div>
+                            <Input v-model.number="bidAmount" type="number" min="1" :max="maxBid"
+                                   placeholder="Bid amount"
+                                   class="col-span-2 md:col-span-4" />
+                            <div v-if="bidAmount > 0" class="col-span-2 md:col-span-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                                Total cost: {{ formatCurrency(bidPlusEquity) }} (bid + down payment)
+                            </div>
+                            <Button @click="placeBid" :disabled="!isBidValid"
+                                    class="col-span-2 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Place Bid</Button>
+                        </template>
+                        <div v-else class="col-span-2 md:col-span-4 text-center text-sm text-red-600 dark:text-red-400">
+                            You can't afford this deal{{ auctionCountdown > 0 ? ` — ${auctionCountdown}s` : '' }}
                         </div>
-                        <Input v-model.number="bidAmount" type="number" min="1" :max="maxBid"
-                               placeholder="Bid amount"
-                               class="col-span-2 md:col-span-4" />
-                        <div v-if="bidAmount > 0" class="col-span-2 md:col-span-4 text-center text-sm text-gray-600 dark:text-gray-400">
-                            Total cost: {{ formatCurrency(bidPlusEquity) }} (bid + down payment)
-                        </div>
-                        <Button @click="placeBid" :disabled="!isBidValid"
-                                class="col-span-2 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Place Bid</Button>
                         <Button @click="auctionPass"
-                                class="col-span-2 min-h-10 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500">Pass</Button>
+                                :class="maxBid > 0 ? 'col-span-2' : 'col-span-2 md:col-span-4'"
+                                class="min-h-10 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500">Pass</Button>
                     </template>
                     <div v-else class="col-span-2 md:col-span-4 text-center py-4">
                         Waiting for other players...
+                        <div v-if="auctionCountdown > 0" class="text-sm mt-1 text-orange-600 dark:text-orange-400">Time remaining: {{ auctionCountdown }}s</div>
+                        <div class="mt-2 text-sm space-y-1">
+                            <div v-for="p in auctionChecklist" :key="p.name" class="flex items-center justify-center gap-1">
+                                <span>{{ p.emoji }} {{ p.name }}</span>
+                                <span v-if="p.responded" class="text-green-600">&#10003;</span>
+                                <span v-else class="text-gray-400">&#8987;</span>
+                            </div>
+                        </div>
                     </div>
                 </template>
 
@@ -295,7 +451,22 @@
         </div>
         <div v-else-if="game!.marketAction" class="m-auto text-center">
             <div v-if="completedMarketAction">
-                Waiting on other players to complete their action.
+                <div>Waiting on other players to complete their action.</div>
+                <div class="mt-2 text-sm space-y-1">
+                    <div v-for="p in marketChecklist" :key="p.name" class="flex items-center justify-center gap-1">
+                        <span>{{ p.emoji }} {{ p.name }}</span>
+                        <span v-if="p.responded" class="text-green-600">&#10003;</span>
+                        <span v-else class="text-gray-400">&#8987;</span>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="turnPlayerNoMarketAssets" class="grid grid-cols-1 m-2 p-2 gap-2 rounded-md bg-slate-300 dark:bg-gray-800 shadow-md">
+                <div class="text-lg font-semibold">{{ game?.marketAction.purchaseOffer?.name }}</div>
+                <div>Offer: {{ formatCurrency(game!.marketAction.purchaseOffer?.price ?? 0) }}</div>
+                <div class="text-sm text-gray-500">You don't own any assets of this type</div>
+                <Button @click="marketPass" class="min-h-10 bg-rose-200 dark:bg-rose-800 hover:bg-rose-200/70 dark:hover:bg-rose-800/80">
+                    {{ marketAutoPassCountdown > 0 ? `Pass (${marketAutoPassCountdown}s)` : 'Pass' }}
+                </Button>
             </div>
             <div v-else class="grid grid-cols-2 md:grid-cols-4 m-2 p-2 gap-2 rounded-md bg-slate-300 dark:bg-gray-800 shadow-md">
                 <div class="col-span-2 md:col-span-4">{{ game?.marketAction.purchaseOffer?.name }}</div>
@@ -345,7 +516,7 @@
 <!--                                    TODO: update this to update per-unit prices -->
                                     {{ formatCurrency(game!.marketAction!.purchaseOffer!.price! - (asset.loanAmount ?? 0)) }}
                                 </div>
-                            </div>
+                            </div>F
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -360,7 +531,7 @@
             <div>{{ `${playerName} ${myTurn ? 'are' : 'is'}` }} still downsized</div>
             <div class="text-xs">(turns remaining: {{ player!.downsizedTurnsRemaining! - 1 }})</div>
             <Button @click="confirmAction" class="min-h-24 bg-red-200 dark:bg-red-800 hover:bg-red-200/70 hover:dark:bg-red-800/80" :disabled="!myTurn">
-                Unfortunate...
+                {{ downsizedCountdown > 0 ? `Unfortunate... (${downsizedCountdown}s)` : 'Unfortunate...' }}
             </Button>
         </div>
     </div>

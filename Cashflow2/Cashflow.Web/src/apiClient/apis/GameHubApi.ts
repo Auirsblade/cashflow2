@@ -67,6 +67,11 @@ export interface HubsGameHubJoinGamePostRequest {
     gameCode?: string;
 }
 
+export interface HubsGameHubLeaveGamePostRequest {
+    gameCode?: string;
+    playerId?: string;
+}
+
 export interface HubsGameHubMarketPassPostRequest {
     gameCode?: string;
     playerId?: string;
@@ -95,6 +100,12 @@ export interface HubsGameHubPlaceBidPostRequest {
     gameCode?: string;
     playerId?: string;
     bidAmount?: number;
+}
+
+export interface HubsGameHubRemovePlayerPostRequest {
+    gameCode?: string;
+    adminId?: string;
+    targetPlayerId?: string;
 }
 
 export interface HubsGameHubSelectProfessionPostRequest {
@@ -399,6 +410,37 @@ export class GameHubApi extends runtime.BaseAPI {
 
     /**
      */
+    async hubsGameHubLeaveGamePostRaw(requestParameters: HubsGameHubLeaveGamePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['playerId'] != null) {
+            queryParameters['playerId'] = requestParameters['playerId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/LeaveGame`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubLeaveGamePost(requestParameters: HubsGameHubLeaveGamePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubLeaveGamePostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async hubsGameHubMarketPassPostRaw(requestParameters: HubsGameHubMarketPassPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -570,6 +612,41 @@ export class GameHubApi extends runtime.BaseAPI {
      */
     async hubsGameHubPlaceBidPost(requestParameters: HubsGameHubPlaceBidPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.hubsGameHubPlaceBidPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async hubsGameHubRemovePlayerPostRaw(requestParameters: HubsGameHubRemovePlayerPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['gameCode'] != null) {
+            queryParameters['gameCode'] = requestParameters['gameCode'];
+        }
+
+        if (requestParameters['adminId'] != null) {
+            queryParameters['adminId'] = requestParameters['adminId'];
+        }
+
+        if (requestParameters['targetPlayerId'] != null) {
+            queryParameters['targetPlayerId'] = requestParameters['targetPlayerId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/hubs/GameHub/RemovePlayer`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hubsGameHubRemovePlayerPost(requestParameters: HubsGameHubRemovePlayerPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hubsGameHubRemovePlayerPostRaw(requestParameters, initOverrides);
     }
 
     /**

@@ -13,7 +13,7 @@ const { game, player } = storeToRefs(gameState);
 
 const showMarket = ref(true);
 const expandedTicker = ref<string | null>(null);
-const tradeQuantity = ref<number>(1);
+const tradeQuantity = ref<number | undefined>(undefined);
 
 const stocks = computed(() => game.value?.stockMarket?.stocks ?? []);
 const positions = computed(() => player.value?.stockPositions ?? []);
@@ -25,13 +25,23 @@ const totalPortfolioValue = computed(() => {
     }, 0);
 });
 
-const totalPnL = computed(() => {
+const totalCostBasis = computed(() => {
     return positions.value.reduce((sum, pos) => {
-        const stock = stocks.value.find(s => s.ticker === pos.ticker);
-        const currentValue = (stock?.currentPrice ?? 0) * (pos.quantity ?? 0);
-        const costBasis = (pos.averageCost ?? 0) * (pos.quantity ?? 0);
-        return sum + (currentValue - costBasis);
+        return sum + (pos.averageCost ?? 0) * (pos.quantity ?? 0);
     }, 0);
+});
+
+const totalPnL = computed(() => {
+    return totalPortfolioValue.value - totalCostBasis.value;
+});
+
+const totalPnLPercent = computed(() => {
+    if (totalCostBasis.value === 0) return 0;
+    return ((totalPortfolioValue.value - totalCostBasis.value) / totalCostBasis.value) * 100;
+});
+
+const totalShares = computed(() => {
+    return positions.value.reduce((sum, pos) => sum + (pos.quantity ?? 0), 0);
 });
 
 function toggleRow(ticker: string) {
@@ -39,7 +49,7 @@ function toggleRow(ticker: string) {
         expandedTicker.value = null;
     } else {
         expandedTicker.value = ticker;
-        tradeQuantity.value = 1;
+        tradeQuantity.value = undefined;
     }
 }
 
@@ -58,14 +68,25 @@ function positionValue(pos: StockPositionModel): number {
     return (stock?.currentPrice ?? 0) * (pos.quantity ?? 0);
 }
 
+function positionCostBasis(pos: StockPositionModel): number {
+    return (pos.averageCost ?? 0) * (pos.quantity ?? 0);
+}
+
+function positionPnLPercent(pos: StockPositionModel): number {
+    const stock = stocks.value.find(s => s.ticker === pos.ticker);
+    const avgCost = pos.averageCost ?? 0;
+    if (avgCost === 0) return 0;
+    return (((stock?.currentPrice ?? 0) - avgCost) / avgCost) * 100;
+}
+
 async function buyStock(ticker: string) {
-    if (tradeQuantity.value <= 0) return;
+    if (!tradeQuantity.value || tradeQuantity.value <= 0) return;
     await gameState.buyStock(ticker, tradeQuantity.value);
     expandedTicker.value = null;
 }
 
 async function sellStock(ticker: string) {
-    if (tradeQuantity.value <= 0) return;
+    if (!tradeQuantity.value || tradeQuantity.value <= 0) return;
     await gameState.sellStock(ticker, tradeQuantity.value);
     expandedTicker.value = null;
 }
@@ -120,15 +141,15 @@ function isBlueChip(stock: StockStateModel): boolean {
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-xs text-gray-500">Max: {{ maxAffordable(stock) }}</span>
                             <Input v-model.number="tradeQuantity" type="number" min="1"
-                                   class="w-20 text-sm" />
+                                   placeholder="Qty" class="w-20 text-sm" />
                             <Button @click="buyStock(stock.ticker!)"
-                                    :disabled="tradeQuantity <= 0 || tradeQuantity > maxAffordable(stock)"
+                                    :disabled="!tradeQuantity || tradeQuantity <= 0 || tradeQuantity > maxAffordable(stock)"
                                     class="text-xs px-3 py-1 bg-green-600 hover:bg-green-700 text-white">
-                                Buy {{ formatCurrency((stock.currentPrice ?? 0) * tradeQuantity) }}
+                                Buy {{ formatCurrency((stock.currentPrice ?? 0) * (tradeQuantity ?? 0)) }}
                             </Button>
                             <Button v-if="ownedQuantity(stock.ticker!) > 0"
                                     @click="sellStock(stock.ticker!)"
-                                    :disabled="tradeQuantity <= 0 || tradeQuantity > ownedQuantity(stock.ticker!)"
+                                    :disabled="!tradeQuantity || tradeQuantity <= 0 || tradeQuantity > ownedQuantity(stock.ticker!)"
                                     class="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white">
                                 Sell
                             </Button>
@@ -145,13 +166,21 @@ function isBlueChip(stock: StockStateModel): boolean {
                 No stocks owned. Switch to Market to buy some!
             </div>
             <template v-else>
-                <div class="flex place-content-between text-xs text-gray-500 mb-1">
-                    <span>Value: {{ formatCurrency(totalPortfolioValue) }}</span>
-                    <span :class="totalPnL >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'">
-                        P&L: {{ totalPnL >= 0 ? '+' : '' }}{{ formatCurrency(totalPnL) }}
-                    </span>
-                </div>
-                <div class="grid grid-cols-[auto_auto_auto_auto] gap-x-3 gap-y-1 text-sm">
+                <div class="grid grid-cols-[auto_auto_auto_auto_auto_auto] gap-x-3 gap-y-1 text-sm">
+                    <!-- Column headers with portfolio totals -->
+                    <div class="text-xs text-gray-500 font-semibold">Stock</div>
+                    <div class="text-xs text-gray-500 font-semibold text-right">{{ totalShares }} shares</div>
+                    <div class="text-xs text-gray-500 font-semibold text-right">Cost {{ formatCurrency(totalCostBasis) }}</div>
+                    <div class="text-xs text-gray-500 font-semibold text-right">Value {{ formatCurrency(totalPortfolioValue) }}</div>
+                    <div class="text-xs font-semibold text-right"
+                         :class="totalPnL >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'">
+                        P&L {{ totalPnL >= 0 ? '+' : '' }}{{ formatCurrency(totalPnL) }}
+                    </div>
+                    <div class="text-xs font-semibold text-right"
+                         :class="totalPnLPercent >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'">
+                        {{ totalPnLPercent >= 0 ? '+' : '' }}{{ totalPnLPercent.toFixed(1) }}%
+                    </div>
+                    <div class="col-span-6"><hr class="my-0.5" /></div>
                     <template v-for="pos in positions" :key="pos.ticker">
                         <div class="cursor-pointer font-mono font-bold" @click="toggleRow(pos.ticker!)">
                             {{ pos.ticker }}
@@ -161,6 +190,9 @@ function isBlueChip(stock: StockStateModel): boolean {
                         <div class="cursor-pointer text-right" @click="toggleRow(pos.ticker!)">
                             {{ pos.quantity }} shares
                         </div>
+                        <div class="cursor-pointer text-right text-gray-500" @click="toggleRow(pos.ticker!)">
+                            {{ formatCurrency(positionCostBasis(pos)) }}
+                        </div>
                         <div class="cursor-pointer text-right" @click="toggleRow(pos.ticker!)">
                             {{ formatCurrency(positionValue(pos)) }}
                         </div>
@@ -169,20 +201,25 @@ function isBlueChip(stock: StockStateModel): boolean {
                              @click="toggleRow(pos.ticker!)">
                             {{ positionPnL(pos) >= 0 ? '+' : '' }}{{ formatCurrency(positionPnL(pos)) }}
                         </div>
-                        <div v-if="expandedTicker === pos.ticker" class="col-span-4 bg-slate-200 dark:bg-gray-800 rounded p-2 mb-1">
+                        <div class="cursor-pointer text-right"
+                             :class="positionPnLPercent(pos) >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'"
+                             @click="toggleRow(pos.ticker!)">
+                            {{ positionPnLPercent(pos) >= 0 ? '+' : '' }}{{ positionPnLPercent(pos).toFixed(1) }}%
+                        </div>
+                        <div v-if="expandedTicker === pos.ticker" class="col-span-6 bg-slate-200 dark:bg-gray-800 rounded p-2 mb-1">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-xs text-gray-500">Owned: {{ pos.quantity }} | Avg: {{ formatCurrency(pos.averageCost ?? 0) }}</span>
                                 <Input v-model.number="tradeQuantity" type="number" min="1"
-                                       class="w-20 text-sm" />
+                                       placeholder="Qty" class="w-20 text-sm" />
                                 <Button @click="sellStock(pos.ticker!)"
-                                        :disabled="tradeQuantity <= 0 || tradeQuantity > (pos.quantity ?? 0)"
+                                        :disabled="!tradeQuantity || tradeQuantity <= 0 || tradeQuantity > (pos.quantity ?? 0)"
                                         class="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white">
                                     Sell
                                 </Button>
                                 <Button @click="buyStock(pos.ticker!)"
-                                        :disabled="tradeQuantity <= 0 || tradeQuantity > maxAffordable(stocks.find(s => s.ticker === pos.ticker)!)"
+                                        :disabled="!tradeQuantity || tradeQuantity <= 0 || tradeQuantity > maxAffordable(stocks.find(s => s.ticker === pos.ticker)!)"
                                         class="text-xs px-3 py-1 bg-green-600 hover:bg-green-700 text-white">
-                                    Buy {{ formatCurrency((stocks.find(s => s.ticker === pos.ticker)?.currentPrice ?? 0) * tradeQuantity) }}
+                                    Buy {{ formatCurrency((stocks.find(s => s.ticker === pos.ticker)?.currentPrice ?? 0) * (tradeQuantity ?? 0)) }}
                                 </Button>
                             </div>
                         </div>

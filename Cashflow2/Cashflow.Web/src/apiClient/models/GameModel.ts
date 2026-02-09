@@ -89,6 +89,12 @@ export interface GameModel {
     currentPlayerId?: string;
     /**
      * 
+     * @type {string}
+     * @memberof GameModel
+     */
+    creatorId?: string;
+    /**
+     * 
      * @type {Array<PlayerModel>}
      * @memberof GameModel
      */
@@ -151,6 +157,7 @@ export function GameModelFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'id': json['id'] == null ? undefined : json['id'],
         'code': json['code'] == null ? undefined : json['code'],
         'currentPlayerId': json['currentPlayerId'] == null ? undefined : json['currentPlayerId'],
+        'creatorId': json['creatorId'] == null ? undefined : json['creatorId'],
         'players': json['players'] == null ? undefined : ((json['players'] as Array<any>).map(PlayerModelFromJSON)),
         'boardSpaces': json['boardSpaces'] == null ? undefined : ((json['boardSpaces'] as Array<any>).map(BoardSpaceModelFromJSON)),
         'confirmAction': json['confirmAction'] == null ? undefined : ConfirmActionModelFromJSON(json['confirmAction']),
@@ -175,6 +182,7 @@ export function GameModelToJSONTyped(value?: GameModel | null, ignoreDiscriminat
         'id': value['id'],
         'code': value['code'],
         'currentPlayerId': value['currentPlayerId'],
+        'creatorId': value['creatorId'],
         'players': value['players'] == null ? undefined : ((value['players'] as Array<any>).map(PlayerModelToJSON)),
         'boardSpaces': value['boardSpaces'] == null ? undefined : ((value['boardSpaces'] as Array<any>).map(BoardSpaceModelToJSON)),
         'confirmAction': ConfirmActionModelToJSON(value['confirmAction']),
