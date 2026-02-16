@@ -4,14 +4,14 @@ namespace Cashflow.API.Services;
 
 public static class LoanService
 {
-    public static bool TakeOutLoan(Player player, decimal amount, int term)
+    public static bool TakeOutLoan(Player player, decimal amount, int term, string name = "Personal Loan")
     {
         if (amount <= 0) return false;
         if (term < 1 || term > 5) return false;
 
         Liability liability = new()
         {
-            Name = "Personal Loan",
+            Name = name,
             Amount = amount,
             InterestRate = 0.10m,
             Term = term * FinancialConstants.PAYMENTS_PER_ROUND

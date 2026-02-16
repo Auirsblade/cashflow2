@@ -85,6 +85,12 @@ export const useGameStateStore = defineStore('gameState', () => {
         await invokeBuyDeal(game.value?.code, player.value?.id);
     }
 
+    const { execute: invokeBuyDealWithLoan } = useSignalRInvoke(connection, 'BuyDealWithLoan');
+
+    async function buyDealWithLoan(loanTerm: number) {
+        await invokeBuyDealWithLoan(game.value?.code, player.value?.id, loanTerm);
+    }
+
     const { execute: invokeSellDeal } = useSignalRInvoke(connection, 'SellDeal');
 
     async function sellDeal() {
@@ -232,6 +238,7 @@ export const useGameStateStore = defineStore('gameState', () => {
         buyCharity,
         getDeal,
         buyDeal,
+        buyDealWithLoan,
         sellDeal,
         placeBid,
         auctionPass,

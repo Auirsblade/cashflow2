@@ -3,7 +3,7 @@ using Cashflow.API;
 using Cashflow.API.DTOs;
 using Cashflow.API.Entities;
 using Cashflow.API.Services;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

@@ -139,6 +139,26 @@ public class GameService(IMemoryCache gameCache)
         gameCache.Set(game.Code, game);
     }
 
+    public void BuyDealWithLoan(Game game, Player player, int loanTerm)
+    {
+        Asset? deal = game.DealAction?.Asset;
+        if (deal == null) return;
+
+        decimal shortfall = deal.Equity - player.Cash;
+        if (shortfall <= 0)
+        {
+            BuyDeal(game, player);
+            return;
+        }
+
+        bool loanSuccess = LoanService.TakeOutLoan(player, shortfall, loanTerm, "Deal Loan");
+        if (!loanSuccess) return;
+
+        player.BuyAsset(deal);
+        CycleTurn(game, player);
+        gameCache.Set(game.Code, game);
+    }
+
     public void SellDeal(Game game, Player player)
     {
         if (game.DealAction?.Asset == null) return;

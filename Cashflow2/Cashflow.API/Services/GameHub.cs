@@ -121,6 +121,17 @@ public class GameHub(GameService gameService) : Hub<IGameClient>
         await Clients.Group(game.Code).GameStateUpdated(game);
     }
 
+    public async Task BuyDealWithLoan(string gameCode, Guid playerId, int loanTerm)
+    {
+        if (await ValidateGameExistence(gameCode) is not { } game) return;
+        if (await ValidatePlayerExistence(game, playerId) is not { } player) return;
+        if (!ValidateCurrentTurn(game, player)) return;
+
+        gameService.BuyDealWithLoan(game, player, loanTerm);
+
+        await Clients.Group(game.Code).GameStateUpdated(game);
+    }
+
     public async Task SellDeal(string gameCode, Guid playerId)
     {
         if (await ValidateGameExistence(gameCode) is not { } game) return;

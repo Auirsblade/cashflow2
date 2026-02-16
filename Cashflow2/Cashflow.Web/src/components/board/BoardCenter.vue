@@ -73,6 +73,29 @@
 
     const bidAmount = ref<number>(0);
 
+    const dealLoanTerm = ref<number>(3);
+    const showDealLoanOption = ref(false);
+
+    const dealShortfall = computed(() => {
+        const equity = game.value?.dealAction?.asset?.equity ?? 0;
+        const cash = player.value?.cash ?? 0;
+        return Math.max(0, equity - cash);
+    });
+
+    const canAffordDeal = computed(() => dealShortfall.value <= 0);
+
+    const PAYMENTS_PER_ROUND = 12;
+
+    const dealLoanMonthlyPayment = computed(() => {
+        const principal = dealShortfall.value;
+        if (principal <= 0 || dealLoanTerm.value < 1) return 0;
+        const rate = 0.10;
+        const monthlyRate = rate / PAYMENTS_PER_ROUND;
+        const payments = dealLoanTerm.value * PAYMENTS_PER_ROUND;
+        const payment = principal * monthlyRate / (1 - Math.pow(1 + monthlyRate, -payments));
+        return Math.round(payment * 100) / 100;
+    });
+
     const isAuctionActive = computed(() => game.value?.dealAction?.auctionState != null);
     const isSeller = computed(() => game.value?.dealAction?.auctionState?.sellerId === player.value?.id);
     const isAuctionComplete = computed(() => game.value?.dealAction?.auctionState?.isComplete === true);
@@ -111,8 +134,21 @@
     };
     const auctionPass = () => gameState.auctionPass();
 
+    const buyDealWithLoan = () => {
+        gameState.buyDealWithLoan(dealLoanTerm.value);
+        rolled.value = 0;
+        promptSelectCharity.value = true;
+        showDealLoanOption.value = false;
+        dealLoanTerm.value = 3;
+    };
+
     watch(() => game.value?.dealAction?.auctionState, (newVal, oldVal) => {
         if (oldVal && !newVal) bidAmount.value = 0;
+    });
+
+    watch(() => game.value?.dealAction, () => {
+        showDealLoanOption.value = false;
+        dealLoanTerm.value = 3;
     });
 
     const completedMarketAction = ref(false);
@@ -367,9 +403,52 @@
 
                 <!-- No auction active: show buy/sell/pass -->
                 <template v-if="!isAuctionActive">
-                    <Button @click="buyDeal" :disabled="(game!.dealAction.asset?.equity ?? 0) > player!.cash! || !myTurn"
-                            class="col-span-2 md:col-span-4 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">Buy Deal
+                    <!-- Buy outright (only shown when player can afford it) -->
+                    <Button v-if="canAffordDeal" @click="buyDeal" :disabled="!myTurn"
+                            class="col-span-2 md:col-span-4 min-h-10 bg-blue-200 dark:bg-blue-800 hover:bg-blue-500">
+                        Buy Deal
                     </Button>
+
+                    <!-- Cannot afford: show loan option -->
+                    <template v-else>
+                        <div v-if="!showDealLoanOption" class="col-span-2 md:col-span-4 text-center text-sm text-red-600 dark:text-red-400 py-1">
+                            You need {{ formatCurrency(dealShortfall) }} more to buy this deal
+                        </div>
+                        <Button v-if="!showDealLoanOption" @click="showDealLoanOption = true" :disabled="!myTurn"
+                                class="col-span-2 md:col-span-4 min-h-10 bg-amber-200 dark:bg-amber-800 hover:bg-amber-500">
+                            Take Out Loan to Buy
+                        </Button>
+
+                        <!-- Loan configuration panel -->
+                        <div v-else class="col-span-2 md:col-span-4 bg-amber-100 dark:bg-amber-900/40 rounded p-2 text-sm">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-semibold">Loan for {{ formatCurrency(dealShortfall) }}</span>
+                                <Button @click="showDealLoanOption = false"
+                                        class="text-xs px-2 py-0.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600">
+                                    Cancel
+                                </Button>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-xs text-gray-500">Term:</span>
+                                    <select v-model.number="dealLoanTerm"
+                                            class="text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1">
+                                        <option :value="1">1 yr</option>
+                                        <option :value="2">2 yr</option>
+                                        <option :value="3">3 yr</option>
+                                        <option :value="4">4 yr</option>
+                                        <option :value="5">5 yr</option>
+                                    </select>
+                                </div>
+                                <span class="text-xs text-gray-500">{{ formatCurrency(dealLoanMonthlyPayment) }}/mo @ 10%</span>
+                                <Button @click="buyDealWithLoan" :disabled="!myTurn"
+                                        class="text-xs px-3 py-1 bg-green-600 hover:bg-green-700 text-white">
+                                    Borrow & Buy
+                                </Button>
+                            </div>
+                        </div>
+                    </template>
+
                     <Button @click="sellDeal" :disabled="!myTurn || (game?.players?.length ?? 0) < 2"
                             class="min-h-10 col-span-2 bg-green-200 dark:bg-green-800 hover:bg-green-500">Sell Deal</Button>
                     <Button @click="confirmAction" class="min-h-10 col-span-2 bg-rose-200 dark:bg-rose-800 hover:bg-rose-500" :disabled="!myTurn">Pass</Button>
