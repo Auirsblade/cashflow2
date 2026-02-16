@@ -6,7 +6,7 @@
     import Board from "@/components/board/Board.vue";
     import ControlCenter from "@/components/ControlCenter.vue";
     import Ticker from "@/components/Ticker.vue";
-    import {computed, onMounted, ref} from "vue";
+    import {computed, onMounted, onUnmounted, provide, ref} from "vue";
     import {
         DropdownMenu,
         DropdownMenuTrigger,
@@ -49,6 +49,38 @@
         gameState.autoRejoin();
     });
 
+    // Secret dev mode: hold D for 2 seconds to toggle
+    const devMode = ref(false);
+    provide('devMode', devMode);
+
+    let dHoldTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'd' || e.key === 'D') {
+            if (e.repeat) return;
+            dHoldTimer = setTimeout(() => {
+                devMode.value = !devMode.value;
+                dHoldTimer = null;
+            }, 2000);
+        }
+    };
+
+    const onKeyUp = (e: KeyboardEvent) => {
+        if (e.key === 'd' || e.key === 'D') {
+            if (dHoldTimer) { clearTimeout(dHoldTimer); dHoldTimer = null; }
+        }
+    };
+
+    onMounted(() => {
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+    });
+
+    onUnmounted(() => {
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
+    });
+
 </script>
 
 <template>
@@ -56,8 +88,9 @@
         <header class="inline-flex items-center w-full">
             <div class="absolute left-0 ml-2 mt-2">
                 <DropdownMenu v-if="game">
-                    <DropdownMenuTrigger>
+                    <DropdownMenuTrigger class="relative">
                         <Icon icon="radix-icons:info-circled" class="h-[1.2rem] w-[1.2rem]"/>
+                        <span v-if="devMode" class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500"></span>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent class="ml-2 bg-slate-400 text-slate-900 dark:bg-gray-900 dark:text-blue-300">
                         <DropdownMenuItem>{{ 'Join Code: ' + game.code }}</DropdownMenuItem>

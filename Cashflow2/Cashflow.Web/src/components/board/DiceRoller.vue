@@ -1,6 +1,6 @@
 ﻿<script setup lang="ts">
     import DiceBox from '@3d-dice/dice-box';
-    import {onMounted, ref} from "vue";
+    import {inject, onMounted, onUnmounted, ref, type Ref} from "vue";
 
     const { diceToRoll } = defineProps({
         diceToRoll: {
@@ -10,6 +10,8 @@
     });
 
     const emit = defineEmits(['diceRolled']);
+
+    const devMode = inject<Ref<boolean>>('devMode', ref(false));
 
     let diceBox: DiceBox;
     const diceLoaded = ref(false);
@@ -25,7 +27,21 @@ onMounted(async () => {
   });
   await diceBox.init();
   diceLoaded.value = true;
+
+  window.addEventListener('keydown', onDevKeyDown);
 });
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onDevKeyDown);
+});
+
+const onDevKeyDown = (e: KeyboardEvent) => {
+  if (!devMode.value) return;
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 9) {
+    emit('diceRolled', num);
+  }
+};
 
 const safeDiceSpec = () => {
   const n = Number.isFinite(diceToRoll) ? Math.floor(diceToRoll) : 0;

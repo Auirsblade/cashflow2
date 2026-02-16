@@ -592,10 +592,9 @@
                                     Profit from sale:
                                 </div>
                                 <div>
-<!--                                    TODO: update this to update per-unit prices -->
-                                    {{ formatCurrency(game!.marketAction!.purchaseOffer!.price! - (asset.loanAmount ?? 0)) }}
+                                    {{ formatCurrency(game!.marketAction!.purchaseOffer!.price! * ((asset.quantity ?? 0) > 0 ? asset.quantity! : 1) - (asset.loanAmount ?? 0)) }}
                                 </div>
-                            </div>F
+                            </div>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
